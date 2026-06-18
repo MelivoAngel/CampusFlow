@@ -19,8 +19,14 @@ return new class extends Migration
                 ->constrained('campuses')
                 ->nullOnDelete();
 
+            $table->foreignId('created_by')
+                ->nullable()
+                ->after('campus_id')
+                ->constrained('users')
+                ->nullOnDelete();
+
             $table->string('role')
-                ->default('personnel')
+                ->default('field_technician')
                 ->after('password');
         });
     }
@@ -30,6 +36,16 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+
+            $table->dropForeign(['campus_id']);
+            $table->dropForeign(['created_by']);
+
+            $table->dropColumn([
+                'campus_id',
+                'created_by',
+                'role'
+            ]);
+        });
     }
 };
