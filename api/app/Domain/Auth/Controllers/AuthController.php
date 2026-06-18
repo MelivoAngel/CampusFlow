@@ -3,7 +3,7 @@
 namespace App\Domain\Auth\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Domain\Auth\Http\LoginRequest;
+use App\Domain\Auth\Requests\LoginRequest;
 use App\Domain\Auth\Services\AuthService;
 use Exception;
 

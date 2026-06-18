@@ -2,7 +2,7 @@
 
 namespace App\Domain\Auth\Services;
 
-use App\Models\User;
+use App\Domain\Users\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Exception;
 

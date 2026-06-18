@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Domain\Users\Models;
 
-use App\Domain\Campus\Models\Campus;
+use App\Domain\Campuses\Models\Campus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,7 +16,8 @@ use Laravel\Sanctum\HasApiTokens;
     'email',
     'password',
     'role',
-    'campus_id'
+    'campus_id',
+    'created_by'
 ])]
 #[Hidden([
     'password',
@@ -28,7 +29,25 @@ class User extends Authenticatable
 
     public function campus()
     {
-        return $this->belongsTo(Campus::class);
+        return $this->belongsTo(
+            Campus::class
+        );
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(
+            User::class,
+            'created_by'
+        );
+    }
+
+    public function createdUsers()
+    {
+        return $this->hasMany(
+            User::class,
+            'created_by'
+        );
     }
 
     protected function casts(): array
