@@ -2,6 +2,7 @@
 use App\Domain\Auth\Controllers\AuthController;
 use App\Domain\Users\Controllers\UserController;
 use App\Domain\Buildings\Controllers\BuildingController;
+use App\Domain\Meters\Controllers\MeterController;
 
 Route::prefix('v1')->group(function () {
 
@@ -17,5 +18,5 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum'])->post('/users',[UserController::class, 'store']);
     Route::middleware(['auth:sanctum'])->post('/buildings',[BuildingController::class, 'store']);
-
+    Route::middleware(['auth:sanctum'])->post('/meters',[MeterController::class, 'store']);
 });
