@@ -13,15 +13,13 @@ return new class extends Migration
     {
         Schema::create('buildings', function (Blueprint $table) {
             $table->id();
-
-            $table->foreignId('campus_id')
-                ->constrained('campuses')
-                ->cascadeOnDelete();
-
+            $table->foreignId('campus_id')->constrained('campuses')->cascadeOnDelete();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->string('type')->nullable();
-
+            $table->boolean('is_active')->default(false);
+            $table->unique(['campus_id','code']);
             $table->timestamps();
         });
     }
