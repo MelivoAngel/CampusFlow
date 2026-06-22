@@ -15,6 +15,8 @@ use App\Domain\Meters\Services\UpdateReadingService;
 use App\Domain\Meters\Policies\CorrectReadingPolicy;
 use App\Domain\Meters\Requests\CorrectReadingRequest;
 use App\Domain\Meters\Services\CorrectionService;
+use App\Domain\Meters\Policies\ApproveReadingPolicy;
+use App\Domain\Meters\Services\ApproveReadingService;
 
 class MeterReadingController
 {
@@ -286,6 +288,62 @@ class MeterReadingController
         return response()->json([
             'success' => true,
             'message' => 'Reading corrected successfully',
+            'data' => $reading
+        ]);
+    }
+
+    public function approve(
+        Request $request,
+        int $id,
+        ApproveReadingPolicy $policy,
+        ApproveReadingService $service
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        $reading = MeterReading::find(
+            $id
+        );
+
+        if (! $reading) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reading not found'
+            ], 404);
+        }
+
+        if (! $policy->canApprove($user, $reading)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot approve this reading'
+            ], 403);
+        }
+
+        if (
+            $service->isAlreadyApproved(
+                $reading
+            )
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reading is already approved'
+            ], 422);
+        }
+
+        $reading->update([
+
+            'approved_by' => $user->id,
+
+            'updated_by' => $user->id,
+
+            'is_approved' => true,
+
+            'was_corrected' => false
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Reading approved successfully',
             'data' => $reading
         ]);
     }
