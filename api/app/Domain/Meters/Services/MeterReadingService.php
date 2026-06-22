@@ -31,7 +31,6 @@ class MeterReadingService
         array $validated,
         User $user,
         ?MeterReading $lastReading,
-        bool $hasAnomaly,
         ?float $consumption,
         string $photoPath
     ): MeterReading
@@ -55,14 +54,6 @@ class MeterReadingService
 
             'photo_path' =>
                 $photoPath,
-
-            'has_anomaly' =>
-                $hasAnomaly,
-
-            'anomaly_reason' =>
-                $hasAnomaly
-                    ? 'Reading lower than previous reading'
-                    : null,
 
             'recorded_date' =>
                 now()->toDateString()
