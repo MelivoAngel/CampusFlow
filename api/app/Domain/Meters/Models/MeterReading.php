@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'has_anomaly',
     'anomaly_reason',
     'is_approved',
+    'was_corrected',
     'recorded_date'
 ])]
 class MeterReading extends Model
