@@ -22,12 +22,4 @@ class UpdateReadingService
             $previousReading;
     }
 
-    public function isAnomaly(
-        float $currentReading,
-        float $previousReading
-    ): bool
-    {
-        return $currentReading <
-            $previousReading;
-    }
 }

@@ -17,6 +17,10 @@ use App\Domain\Meters\Requests\CorrectReadingRequest;
 use App\Domain\Meters\Services\CorrectionService;
 use App\Domain\Meters\Policies\ApproveReadingPolicy;
 use App\Domain\Meters\Services\ApproveReadingService;
+use App\Domain\Meters\Services\AnomalyDetectionService;
+use App\Domain\Meters\Services\AnomalyService;
+use App\Domain\Meters\Services\AnomalyLockService;
+use App\Domain\Meters\Services\ResolveAnomalyService;
 
 class MeterReadingController
 {
@@ -24,20 +28,12 @@ class MeterReadingController
         Request $request,
         SubmitReadingRequest $validator,
         MeterReadingService $service,
-        ReadingValidationService $readingValidator
+        ReadingValidationService $readingValidator,
+        AnomalyDetectionService $detector,
+        AnomalyService $anomalyService
     ): JsonResponse
     {
         $user = $request->user();
-
-        if (
-            $user->role !==
-            'field_technician'
-        ) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Only technicians can edit submissions'
-            ], 403);
-        }
 
         if ($user->role !== 'field_technician') {
             return response()->json([
@@ -92,12 +88,12 @@ class MeterReadingController
             $validated['meter_id']
         );
 
-        $hasAnomaly = $readingValidator->isAnomaly(
+        $consumption = $service->calculateConsumption(
             $validated['current_reading'],
             $lastReading
         );
 
-        $consumption = $service->calculateConsumption(
+        $anomaly = $detector->detect(
             $validated['current_reading'],
             $lastReading
         );
@@ -113,10 +109,17 @@ class MeterReadingController
             $validated,
             $user,
             $lastReading,
-            $hasAnomaly,
             $consumption,
             $photoPath
         );
+
+        if ($anomaly) {
+            $anomalyService->create(
+                $reading,
+                $user,
+                $anomaly
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -125,13 +128,14 @@ class MeterReadingController
         ]);
     }
 
-
     public function update(
         Request $request,
         int $id,
         UpdateReadingRequest $validator,
         ReadingEditPolicy $policy,
-        UpdateReadingService $service
+        UpdateReadingService $service,
+        AnomalyDetectionService $detector,
+        AnomalyService $anomalyService
     ): JsonResponse
     {
         $user = $request->user();
@@ -168,14 +172,22 @@ class MeterReadingController
             ], 422);
         }
 
-        $hasAnomaly = $service->isAnomaly(
+        $consumption = $service->calculateConsumption(
             $validated['current_reading'],
             $reading->previous_reading
         );
 
-        $consumption = $service->calculateConsumption(
+        $fakeLastReading = new MeterReading();
+
+        $fakeLastReading->current_reading =
+            $reading->previous_reading;
+
+        $fakeLastReading->consumption =
+            $reading->consumption;
+
+        $anomaly = $detector->detect(
             $validated['current_reading'],
-            $reading->previous_reading
+            $fakeLastReading
         );
 
         $photoPath = $reading->photo_path;
@@ -184,7 +196,7 @@ class MeterReadingController
             $photoPath = $request->file('photo')->store('meter-readings', 'public');
         }
 
-        $updateData = [
+        $reading->update([
 
             'updated_by' => $user->id,
 
@@ -192,18 +204,23 @@ class MeterReadingController
 
             'consumption' => $consumption,
 
-            'photo_path' => $photoPath,
+            'photo_path' => $photoPath
+        ]);
 
-            'has_anomaly' => $hasAnomaly,
+        if ($anomaly) {
+            $anomalyService->create(
+                $reading,
+                $user,
+                $anomaly
+            );
+        }
 
-            'anomaly_reason' => $hasAnomaly
-                ? 'Reading lower than previous reading'
-                : null
-        ];
-
-        $reading->update(
-            $updateData
-        );
+        if (! $anomaly) {
+            $anomalyService->resolveExisting(
+                $reading,
+                $user
+            );
+        }
 
         return response()->json([
             'success' => true,
@@ -217,7 +234,8 @@ class MeterReadingController
         int $id,
         CorrectReadingRequest $validator,
         CorrectReadingPolicy $policy,
-        CorrectionService $service
+        CorrectionService $service,
+        ResolveAnomalyService $resolver
     ): JsonResponse
     {
         $user = $request->user();
@@ -254,11 +272,6 @@ class MeterReadingController
             ], 422);
         }
 
-        $hasAnomaly = $service->isAnomaly(
-            $validated['current_reading'],
-            $reading->previous_reading
-        );
-
         $consumption = $service->calculateConsumption(
             $validated['current_reading'],
             $reading->previous_reading
@@ -274,16 +287,15 @@ class MeterReadingController
 
             'consumption' => $consumption,
 
-            'has_anomaly' => $hasAnomaly,
-
-            'anomaly_reason' => $hasAnomaly
-                ? 'Reading lower than previous reading'
-                : null,
-
             'is_approved' => true,
 
             'was_corrected' => true
         ]);
+
+        $resolver->resolveByReading(
+            $reading->id,
+            $user
+        );
 
         return response()->json([
             'success' => true,
@@ -296,7 +308,8 @@ class MeterReadingController
         Request $request,
         int $id,
         ApproveReadingPolicy $policy,
-        ApproveReadingService $service
+        ApproveReadingService $service,
+        AnomalyLockService $lockService
     ): JsonResponse
     {
         $user = $request->user();
@@ -317,6 +330,17 @@ class MeterReadingController
                 'success' => false,
                 'message' => 'You cannot approve this reading'
             ], 403);
+        }
+
+        if (
+            $lockService->hasUnresolvedAnomaly(
+                $reading->meter_id
+            )
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This meter has unresolved anomalies. Resolve anomaly before approval'
+            ], 422);
         }
 
         if (

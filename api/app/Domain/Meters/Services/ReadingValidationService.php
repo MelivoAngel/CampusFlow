@@ -17,17 +17,4 @@ class ReadingValidationService
             'recorded_date'
         )->first();
     }
-
-    public function isAnomaly(
-        float $currentReading,
-        ?MeterReading $lastReading
-    ): bool
-    {
-        if (! $lastReading) {
-            return false;
-        }
-
-        return $currentReading <
-            $lastReading->current_reading;
-    }
 }
