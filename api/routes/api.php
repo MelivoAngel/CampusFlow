@@ -19,9 +19,11 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum'])->post('/users',[UserController::class, 'store']);
     Route::middleware(['auth:sanctum'])->post('/buildings',[BuildingController::class, 'store']);
+    Route::middleware(['auth:sanctum'])->patch('/buildings/{id}',[BuildingController::class, 'update']);
     Route::middleware(['auth:sanctum'])->post('/meters',[MeterController::class, 'store']);
     Route::middleware(['auth:sanctum'])->post('/meter-readings',[MeterReadingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->put('/meter-readings/{id}',[MeterReadingController::class, 'update']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/correct',[MeterReadingController::class, 'correct']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/approve',[MeterReadingController::class, 'approve']);
+    
 });
