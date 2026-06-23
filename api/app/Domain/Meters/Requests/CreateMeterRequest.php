@@ -3,6 +3,7 @@
 namespace App\Domain\Meters\Requests;
 
 use App\Domain\Meters\Enums\MeterPermission;
+use App\Domain\Meters\Enums\MeterResourceType;
 use App\Domain\Users\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -18,10 +19,12 @@ class CreateMeterRequest
 
             'resource_type' => [
                 'required',
-                Rule::in([
-                    'water',
-                    'electricity'
-                ])
+                Rule::in(
+                    array_column(
+                        MeterResourceType::cases(),
+                        'value'
+                    )
+                )
             ],
 
             'meter_code' => [

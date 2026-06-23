@@ -8,12 +8,14 @@ import CreateUserModal from '../components/CreateUserModal.vue'
 import EditUserModal from '../components/EditUserModal.vue'
 
 import { getUsersRequest } from '../services/userApi'
+import { adminRoles } from '../../../constants/roles'
+import type { User } from '../../../types/user'
 
 const authStore =
   useAuthStore()
 
 const users =
-  ref([])
+  ref<User[]>([])
 
 const loading =
   ref(false)
@@ -25,19 +27,11 @@ const showEditModal =
   ref(false)
 
 const selectedUser =
-  ref<any>(null)
+  ref<User | null>(null)
 
 const canCreate = computed(() => {
 
-  return [
-
-    'super_admin',
-
-    'campus_admin',
-
-    'staff'
-
-  ].includes(
+  return adminRoles.includes(
 
     authStore.user?.role || ''
   )
@@ -65,7 +59,7 @@ const fetchUsers = async () => {
 }
 
 const handleEdit = (
-  user: any
+  user: User
 ) => {
 
   selectedUser.value =

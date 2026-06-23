@@ -1,42 +1,105 @@
+const adminMenu = [
+
+  {
+    section: '',
+
+    items: [
+
+      { name: 'Dashboard', path: '/dashboard' }
+    ]
+  },
+
+  {
+    section: 'Management',
+
+    items: [
+
+      { name: 'Users', path: '/users' },
+
+      { name: 'Meters', path: '/meters' },
+
+      { name: 'Buildings', path: '/buildings' }
+    ]
+  },
+
+  {
+    section: 'Operations',
+
+    items: [
+
+      { name: 'Reading Queue', path: '/reading-queue' },
+
+      { name: 'Anomalies', path: '/anomalies' }
+    ]
+  },
+
+  {
+    section: 'Insights',
+
+    items: [
+
+      { name: 'Analytics', path: '/analytics' },
+
+      { name: 'Export Reports', path: '/reports' }
+    ]
+  }
+]
+
 export const menu = {
 
   super_admin: [
 
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Users', path: '/users' },
-    { name: 'Buildings', path: '/buildings' },
-    { name: 'Meters', path: '/meters' },
-    { name: 'Reports', path: '/reports' },
-    { name: 'Analytics', path: '/analytics' },
-    { name: 'Events', path: '/events' }
+    ...adminMenu,
+
+    {
+      section: 'Calendar',
+
+      items: [
+
+        { name: 'Events', path: '/events' }
+      ]
+    }
   ],
 
   campus_admin: [
 
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Users', path: '/users' },
-    { name: 'Buildings', path: '/buildings' },
-    { name: 'Meters', path: '/meters' },
-    { name: 'Reports', path: '/reports' },
-    { name: 'Analytics', path: '/analytics' },
-    { name: 'Events', path: '/events' }
+    ...adminMenu,
+
+    {
+      section: 'Calendar',
+
+      items: [
+
+        { name: 'Events', path: '/events' }
+      ]
+    }
   ],
 
   staff: [
 
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Users', path: '/users' },
-    { name: 'Buildings', path: '/buildings' },
-    { name: 'Meters', path: '/meters' },
-    { name: 'Reports', path: '/reports' },
-    { name: 'Analytics', path: '/analytics' },
-    { name: 'Approvals', path: '/approvals' }
+    ...adminMenu
   ],
 
   calendar_admin: [
 
-    { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Events', path: '/events' },
-    { name: 'Calendar', path: '/calendar' }
+    {
+      section: '',
+
+      items: [
+
+        { name: 'Dashboard', path: '/dashboard' }
+      ]
+    },
+
+    {
+      section: 'Calendar',
+
+      items: [
+
+        { name: 'Events', path: '/events' },
+
+        { name: 'Calendar', path: '/calendar' }
+      ]
+    }
   ]
 }

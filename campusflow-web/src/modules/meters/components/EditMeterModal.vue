@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { ref,watch } from 'vue'
 
-import { updateUserRequest } from '../services/userApi'
-import type { User } from '../../../types/user'
+import { updateMeterRequest } from '../services/meterApi'
+
+import type { Meter } from '../../../types/meter'
+
+import type {
+  UpdateMeterPayload
+} from '../../../types/requests'
 
 const props =
   defineProps<{
+
     show: boolean
-    user: User | null
+
+    meter: Meter | null
 }>()
 
 const emit =
@@ -19,11 +26,11 @@ const emit =
 const name =
   ref('')
 
-const email =
+const description =
   ref('')
 
-const password =
-  ref('')
+const isActive =
+  ref(true)
 
 const errors =
   ref<Record<string,string[]>>({})
@@ -36,22 +43,22 @@ const successMessage =
 
 watch(
 
-  () => props.user,
+  () => props.meter,
 
-  (user) => {
+  (meter) => {
 
-    if (!user) {
+    if (!meter) {
       return
     }
 
     name.value =
-      user.name
+      meter.name
 
-    email.value =
-      user.email
+    description.value =
+      meter.description || ''
 
-    password.value =
-      ''
+    isActive.value =
+      meter.is_active
   },
 
   { immediate: true }
@@ -65,19 +72,25 @@ const handleUpdate = async () => {
 
   try {
 
-    await updateUserRequest(
+    const payload:
+      UpdateMeterPayload = {
 
-      props.user!.id,
+      name: name.value,
 
-      {
-        name: name.value,
-        email: email.value,
-        password: password.value
-      }
+      description: description.value,
+
+      is_active: isActive.value
+    }
+
+    await updateMeterRequest(
+
+      props.meter!.id,
+
+      payload
     )
 
     successMessage.value =
-      'User updated successfully'
+      'Meter updated successfully'
 
     emit('updated')
 
@@ -125,7 +138,7 @@ const handleUpdate = async () => {
       <div class="flex justify-between mb-6">
 
         <h2 class="text-xl font-semibold">
-          Edit User
+          Edit Meter
         </h2>
 
         <button @click="emit('close')">
@@ -138,22 +151,28 @@ const handleUpdate = async () => {
 
         <input
           v-model="name"
-          placeholder="Name"
+          placeholder="Meter Name"
           :class="['w-full px-3 py-2 rounded-md border',errors.name ? 'border-red-500 animate-shake' : 'border-gray-300']"
         >
 
-        <input
-          v-model="email"
-          placeholder="Email"
-          :class="['w-full px-3 py-2 rounded-md border',errors.email ? 'border-red-500 animate-shake' : 'border-gray-300']"
-        >
+        <textarea
+          v-model="description"
+          placeholder="Description"
+          :class="['w-full px-3 py-2 rounded-md border',errors.description ? 'border-red-500 animate-shake' : 'border-gray-300']"
+        />
 
-        <input
-          v-model="password"
-          type="password"
-          placeholder="New Password (Optional)"
-          :class="['w-full px-3 py-2 rounded-md border',errors.password ? 'border-red-500 animate-shake' : 'border-gray-300']"
+        <select
+          v-model="isActive"
+          class="w-full px-3 py-2 rounded-md border border-gray-300"
         >
+          <option :value="true">
+            Active
+          </option>
+
+          <option :value="false">
+            Inactive
+          </option>
+        </select>
 
         <p
           v-if="successMessage"
