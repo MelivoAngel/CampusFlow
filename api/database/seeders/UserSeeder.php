@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'email' => 'alangilan.admin@campusflow.com',
                 'password' => Hash::make('password'),
                 'role' => UserRole::CAMPUS_ADMIN->value,
-                'campus_id' => 3,
+                'campus_id' => 1,
                 'created_by' => 1,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 'email' => 'alangilan.staff@campusflow.com',
                 'password' => Hash::make('password'),
                 'role' => UserRole::STAFF->value,
-                'campus_id' => 3,
+                'campus_id' => 1,
                 'created_by' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -51,7 +51,7 @@ class UserSeeder extends Seeder
                 'email' => 'alangilan.tech@campusflow.com',
                 'password' => Hash::make('password'),
                 'role' => UserRole::FIELD_TECHNICIAN->value,
-                'campus_id' => 3,
+                'campus_id' => 1,
                 'created_by' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -62,7 +62,7 @@ class UserSeeder extends Seeder
                 'email' => 'alangilan.calendar@campusflow.com',
                 'password' => Hash::make('password'),
                 'role' => UserRole::CALENDAR_ADMIN->value,
-                'campus_id' => 3,
+                'campus_id' => 1,
                 'created_by' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
