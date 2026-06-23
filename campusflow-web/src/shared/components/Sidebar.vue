@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+
 import { useAuthStore } from '../../stores/authStore'
 import { menu } from '../sidebar/menu'
 
-const authStore = useAuthStore()
+import { formatLabel } from '../../utils/formatters'
+
+const authStore =
+  useAuthStore()
 
 const items = computed(() => {
 
@@ -18,31 +22,71 @@ const items = computed(() => {
 </script>
 
 <template>
-  <aside class="w-64 bg-emerald-900 text-white min-h-screen p-6">
+
+  <aside class="w-56 bg-emerald-900 text-white min-h-screen px-5 py-6">
 
     <h2 class="text-2xl font-bold">
       CampusFLOW
     </h2>
 
-    <div class="mb-8 text-sm text-gray-300">
-      {{ authStore.user?.role }}
+    <div class="mt-1 mb-8 text-sm text-gray-300">
+
+      {{ formatLabel(
+
+        authStore.user?.role || ''
+
+      ) }}
+
     </div>
 
-    <ul class="space-y-3">
+    <div
+      v-for="group in items"
+      :key="group.section"
+      class="mb-7"
+    >
 
-      <router-link
-        v-for="item in items"
-        :key="item.name"
-        :to="item.path"
+      <p
+        v-if="group.section"
+        class="text-[11px] uppercase text-gray-400 mb-3 mt-2 tracking-widest"
       >
+        {{ group.section }}
+      </p>
 
-        <li class="cursor-pointer hover:bg-emerald-700 px-3 py-2 rounded-md">
-          {{ item.name }}
+      <ul class="space-y-1">
+
+        <li
+          v-for="item in group.items"
+          :key="item.name"
+        >
+
+          <router-link
+            :to="item.path"
+            v-slot="{ isActive }"
+          >
+
+            <div
+              :class="[
+
+                'pl-3 pr-2 py-2 rounded-md cursor-pointer transition-all duration-200 border-l-4 text-sm',
+
+                isActive
+
+                  ? 'bg-emerald-700 border-white font-medium'
+
+                  : 'border-transparent hover:bg-emerald-800/70'
+              ]"
+            >
+              {{ item.name }}
+            </div>
+
+          </router-link>
+
         </li>
 
-      </router-link>
+      </ul>
 
-    </ul>
+    </div>
 
   </aside>
+
 </template>

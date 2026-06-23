@@ -2,7 +2,7 @@
 
 namespace App\Domain\Meters\Models;
 
-use App\Domain\Campus\Models\Campus;
+use App\Domain\Campuses\Models\Campus;
 use App\Domain\Users\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;

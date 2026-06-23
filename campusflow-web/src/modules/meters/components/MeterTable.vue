@@ -2,17 +2,12 @@
 import { computed } from 'vue'
 import { useAuthStore } from '../../../stores/authStore'
 
-import type { User } from '../../../types/user'
-
-import {
-  campusManageRoles,
-  staffManageRoles
-} from '../../../constants/roles'
-
+import type { Meter } from '../../../types/meter'
+import { adminRoles } from '../../../constants/roles'
 import { formatLabel } from '../../../utils/formatters'
 
 defineProps<{
-  users: User[]
+  meters: Meter[]
 }>()
 
 const emit =
@@ -31,37 +26,13 @@ const showCampus = computed(() => {
   )
 })
 
-const canEdit = (
-  role: string
-) => {
+const canEdit = computed(() => {
 
-  if (
-    authStore.user?.role ===
-    'super_admin'
-  ) {
-    return true
-  }
+  return adminRoles.includes(
 
-  if (
-    authStore.user?.role ===
-    'campus_admin'
-  ) {
-    return campusManageRoles.includes(
-      role
-    )
-  }
-
-  if (
-    authStore.user?.role ===
-    'staff'
-  ) {
-    return staffManageRoles.includes(
-      role
-    )
-  }
-
-  return false
-}
+    authStore.user?.role || ''
+  )
+})
 </script>
 
 <template>
@@ -77,11 +48,11 @@ const canEdit = (
         </th>
 
         <th class="text-left py-3">
-          Email
+          Meter Code
         </th>
 
         <th class="text-left py-3">
-          Role
+          Resource Type
         </th>
 
         <th
@@ -89,6 +60,10 @@ const canEdit = (
           class="text-left py-3"
         >
           Campus
+        </th>
+
+        <th class="text-left py-3">
+          Status
         </th>
 
         <th class="text-left py-3">
@@ -102,35 +77,39 @@ const canEdit = (
     <tbody>
 
       <tr
-        v-for="user in users"
-        :key="user.id"
+        v-for="meter in meters"
+        :key="meter.id"
         class="border-b"
       >
 
         <td class="py-4">
-          {{ user.name }}
+          {{ meter.name }}
         </td>
 
         <td class="py-4">
-          {{ user.email }}
+          {{ meter.meter_code }}
         </td>
 
         <td class="py-4">
-          {{ formatLabel(user.role) }}
+          {{ formatLabel(meter.resource_type) }}
         </td>
 
         <td
           v-if="showCampus"
           class="py-4"
         >
-          {{ user.campus?.name || '-' }}
+          {{ meter.campus?.name || '-' }}
+        </td>
+
+        <td class="py-4">
+          {{ meter.is_active ? 'Active' : 'Inactive' }}
         </td>
 
         <td class="py-4">
 
           <button
-            v-if="canEdit(user.role)"
-            @click="emit('edit',user)"
+            v-if="canEdit"
+            @click="emit('edit',meter)"
             class="text-blue-600"
           >
             Edit

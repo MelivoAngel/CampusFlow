@@ -2,28 +2,22 @@
 import { ref,computed,onMounted } from 'vue'
 import { useAuthStore } from '../../../stores/authStore'
 
-import {
-  createUserRequest,
-  getCampusesRequest
-} from '../services/userApi'
+import { createMeterRequest } from '../services/meterApi'
+import { getCampusesRequest } from '../../users/services/userApi'
 
 import type { Campus } from '../../../types/campus'
 
 import type {
-  CreateUserPayload
+  CreateMeterPayload
 } from '../../../types/requests'
 
-import {
-  superAdminCreateRoles,
-  campusAdminCreateRoles,
-  staffCreateRoles
-} from '../../../constants/roles'
-
+import { resourceTypes } from '../../../constants/resourceTypes'
 import { formatLabel } from '../../../utils/formatters'
 
-defineProps({
-  show: Boolean
-})
+const props =
+  defineProps<{
+    show: boolean
+}>()
 
 const emit =
   defineEmits([
@@ -34,23 +28,23 @@ const emit =
 const authStore =
   useAuthStore()
 
-const campuses =
-  ref<Campus[]>([])
-
 const name =
   ref('')
 
-const email =
+const meterCode =
   ref('')
 
-const password =
+const resourceType =
   ref('')
 
-const role =
+const description =
   ref('')
 
 const campusId =
   ref('')
+
+const campuses =
+  ref<Campus[]>([])
 
 const errors =
   ref<Record<string,string[]>>({})
@@ -61,7 +55,7 @@ const firstError =
 const successMessage =
   ref('')
 
-const isSuperAdmin = computed(() => {
+const showCampus = computed(() => {
 
   return (
     authStore.user?.role ===
@@ -69,25 +63,9 @@ const isSuperAdmin = computed(() => {
   )
 })
 
-const roles = computed(() => {
-
-  if (isSuperAdmin.value) {
-    return superAdminCreateRoles
-  }
-
-  if (
-    authStore.user?.role ===
-    'campus_admin'
-  ) {
-    return campusAdminCreateRoles
-  }
-
-  return staffCreateRoles
-})
-
 const fetchCampuses = async () => {
 
-  if (!isSuperAdmin.value) {
+  if (!showCampus.value) {
     return
   }
 
@@ -107,9 +85,9 @@ const fetchCampuses = async () => {
 const resetForm = () => {
 
   name.value = ''
-  email.value = ''
-  password.value = ''
-  role.value = ''
+  meterCode.value = ''
+  resourceType.value = ''
+  description.value = ''
   campusId.value = ''
 
   errors.value = {}
@@ -126,25 +104,28 @@ const handleCreate = async () => {
   try {
 
     const payload:
-      CreateUserPayload = {
+      CreateMeterPayload = {
 
       name: name.value,
-      email: email.value,
-      password: password.value,
-      role: role.value
+
+      meter_code: meterCode.value,
+
+      resource_type: resourceType.value,
+
+      description: description.value
     }
 
-    if (isSuperAdmin.value) {
+    if (showCampus.value) {
       payload.campus_id =
         campusId.value
     }
 
-    await createUserRequest(
+    await createMeterRequest(
       payload
     )
 
     successMessage.value =
-      'User created successfully'
+      'Meter created successfully'
 
     emit('created')
 
@@ -185,6 +166,7 @@ const handleCreate = async () => {
 }
 
 onMounted(() => {
+
   fetchCampuses()
 })
 </script>
@@ -198,7 +180,7 @@ onMounted(() => {
       <div class="flex justify-between mb-6">
 
         <h2 class="text-xl font-semibold">
-          Create User
+          Add Meter
         </h2>
 
         <button @click="emit('close')">
@@ -211,44 +193,37 @@ onMounted(() => {
 
         <input
           v-model="name"
-          placeholder="Name"
+          placeholder="Meter Name"
           :class="['w-full px-3 py-2 rounded-md border',errors.name ? 'border-red-500 animate-shake' : 'border-gray-300']"
         >
 
         <input
-          v-model="email"
-          placeholder="Email"
-          :class="['w-full px-3 py-2 rounded-md border',errors.email ? 'border-red-500 animate-shake' : 'border-gray-300']"
-        >
-
-        <input
-          v-model="password"
-          type="password"
-          placeholder="Password"
-          :class="['w-full px-3 py-2 rounded-md border',errors.password ? 'border-red-500 animate-shake' : 'border-gray-300']"
+          v-model="meterCode"
+          placeholder="Meter Code"
+          :class="['w-full px-3 py-2 rounded-md border',errors.meter_code ? 'border-red-500 animate-shake' : 'border-gray-300']"
         >
 
         <select
-          v-model="role"
-          :class="['w-full px-3 py-2 rounded-md border',errors.role ? 'border-red-500 animate-shake' : 'border-gray-300']"
+          v-model="resourceType"
+          :class="['w-full px-3 py-2 rounded-md border',errors.resource_type ? 'border-red-500 animate-shake' : 'border-gray-300']"
         >
 
           <option value="">
-            Select Role
+            Select Resource Type
           </option>
 
           <option
-            v-for="item in roles"
-            :key="item"
-            :value="item"
+            v-for="type in resourceTypes"
+            :key="type"
+            :value="type"
           >
-            {{ formatLabel(item) }}
+            {{ formatLabel(type) }}
           </option>
 
         </select>
 
         <select
-          v-if="isSuperAdmin"
+          v-if="showCampus"
           v-model="campusId"
           :class="['w-full px-3 py-2 rounded-md border',errors.campus_id ? 'border-red-500 animate-shake' : 'border-gray-300']"
         >
@@ -267,6 +242,12 @@ onMounted(() => {
 
         </select>
 
+        <textarea
+          v-model="description"
+          placeholder="Description"
+          :class="['w-full px-3 py-2 rounded-md border',errors.description ? 'border-red-500 animate-shake' : 'border-gray-300']"
+        />
+
         <p
           v-if="successMessage"
           class="text-green-600 text-sm"
@@ -282,7 +263,7 @@ onMounted(() => {
         </p>
 
         <button @click="handleCreate" class="w-full bg-emerald-700 text-white py-2 rounded-md">
-          Create User
+          Create Meter
         </button>
 
       </div>
