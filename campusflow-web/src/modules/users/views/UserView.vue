@@ -1,40 +1,83 @@
 <script setup lang="ts">
+import { ref,onMounted,computed } from 'vue'
+import { useAuthStore } from '../../../stores/authStore'
+
 import AppLayout from '../../../shared/layouts/AppLayout.vue'
+import UserTable from '../components/UserTable.vue'
+import CreateUserModal from '../components/CreateUserModal.vue'
+import EditUserModal from '../components/EditUserModal.vue'
 
-const users = [
+import { getUsersRequest } from '../services/userApi'
 
-  {
-    id: 1,
-    name: 'System Administrator',
-    email: 'admin@campusflow.com',
-    role: 'super_admin',
-    campus_id: null
-  },
+const authStore =
+  useAuthStore()
 
-  {
-    id: 2,
-    name: 'Alangilan Admin',
-    email: 'alangilan.admin@campusflow.com',
-    role: 'campus_admin',
-    campus_id: 1
-  },
+const users =
+  ref([])
 
-  {
-    id: 3,
-    name: 'Alangilan Staff',
-    email: 'alangilan.staff@campusflow.com',
-    role: 'staff',
-    campus_id: 1
-  },
+const loading =
+  ref(false)
 
-  {
-    id: 4,
-    name: 'Gym Scheduler',
-    email: 'gym.calendar@campusflow.com',
-    role: 'calendar_admin',
-    campus_id: 1
+const showModal =
+  ref(false)
+
+const showEditModal =
+  ref(false)
+
+const selectedUser =
+  ref<any>(null)
+
+const canCreate = computed(() => {
+
+  return [
+
+    'super_admin',
+
+    'campus_admin',
+
+    'staff'
+
+  ].includes(
+
+    authStore.user?.role || ''
+  )
+})
+
+const fetchUsers = async () => {
+
+  loading.value =
+    true
+
+  try {
+    const response =
+      await getUsersRequest()
+
+    users.value =
+      response.data.data
   }
-]
+
+  catch (error) {
+    console.log(error)
+  }
+
+  loading.value =
+    false
+}
+
+const handleEdit = (
+  user: any
+) => {
+
+  selectedUser.value =
+    user
+
+  showEditModal.value =
+    true
+}
+
+onMounted(() => {
+  fetchUsers()
+})
 </script>
 
 <template>
@@ -48,79 +91,48 @@ const users = [
           Users
         </h1>
 
-        <button class="bg-emerald-700 text-white px-4 py-2 rounded-md">
+        <button
+          v-if="canCreate"
+          @click="showModal = true"
+          class="bg-emerald-700 text-white px-4 py-2 rounded-md"
+        >
           Add User
         </button>
 
       </div>
 
-      <table class="w-full">
+      <p
+        v-if="loading"
+        class="text-gray-500"
+      >
+        Loading users...
+      </p>
 
-        <thead>
+      <p
+        v-else-if="!users.length"
+        class="text-gray-500"
+      >
+        No users found
+      </p>
 
-          <tr class="border-b">
+      <UserTable
+        v-else
+        :users="users"
+        @edit="handleEdit"
+      />
 
-            <th class="text-left py-3">
-              Name
-            </th>
+      <CreateUserModal
+        :show="showModal"
+        @close="showModal = false"
+        @created="fetchUsers"
+      />
 
-            <th class="text-left py-3">
-              Email
-            </th>
-
-            <th class="text-left py-3">
-              Role
-            </th>
-
-            <th class="text-left py-3">
-              Campus
-            </th>
-
-            <th class="text-left py-3">
-              Actions
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          <tr v-for="user in users" :key="user.id" class="border-b">
-
-            <td class="py-4">
-              {{ user.name }}
-            </td>
-
-            <td class="py-4">
-              {{ user.email }}
-            </td>
-
-            <td class="py-4">
-              {{ user.role }}
-            </td>
-
-            <td class="py-4">
-              {{ user.campus_id }}
-            </td>
-
-            <td class="py-4">
-
-              <button class="text-blue-600 mr-3">
-                Edit
-              </button>
-
-              <button class="text-red-600">
-                Delete
-              </button>
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
+      <EditUserModal
+        :show="showEditModal"
+        :user="selectedUser"
+        @close="showEditModal = false"
+        @updated="fetchUsers"
+      />
 
     </div>
 
