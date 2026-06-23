@@ -1,52 +1,48 @@
 <script setup lang="ts">
 import Sidebar from '../components/Sidebar.vue'
-import { useRouter } from 'vue-router'
+import SettingsDropdown from '../components/SettingsDropdown.vue'
+import ThemeToggle from '../components/ThemeToggle.vue'
+
 import { useAuthStore } from '../../stores/authStore'
-import { logoutRequest } from '../../modules/auth/services/authApi'
+import { useClock } from '../../composables/useClock'
 
-const authStore = useAuthStore()
+const authStore =
+  useAuthStore()
 
-const router = useRouter()
-
-const handleLogout = async () => {
-  try {
-    await logoutRequest()
-  }
-
-  catch (error) {
-    console.log(error)
-  }
-
-  authStore.logout()
-
-  router.push('/')
-}
+const {
+  currentTime
+} = useClock()
 </script>
 
 <template>
+
   <div class="flex min-h-screen bg-gray-100">
-    
+
     <Sidebar />
 
     <div class="flex-1 flex flex-col">
 
-      <header class="bg-white shadow-sm px-6 py-4">
+      <header class="bg-white border-b px-6 py-3">
 
-        <div class="flex justify-between items-center">
+        <div class="flex items-center">
 
-          <h1 class="text-lg font-semibold">
-            CampusFLOW
-          </h1>
+          <div class="text-sm text-gray-500">
 
-          <div class="flex items-center gap-4">
+            {{ currentTime }}
 
-            <span class="text-sm font-medium">
+          </div>
+
+          <div class="ml-auto mr-6 flex items-center gap-5">
+
+            <ThemeToggle />
+
+            <span class="text-sm font-medium text-gray-700">
+
               {{ authStore.user?.name }}
+
             </span>
 
-            <button @click="handleLogout" class="bg-red-500 text-white px-3 py-1 rounded-md">
-              Logout
-            </button>
+            <SettingsDropdown />
 
           </div>
 
@@ -55,9 +51,13 @@ const handleLogout = async () => {
       </header>
 
       <main class="p-6">
+
         <slot />
+
       </main>
 
     </div>
+
   </div>
+
 </template>
