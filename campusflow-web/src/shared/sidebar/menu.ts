@@ -2,58 +2,41 @@ export const menu = {
 
   super_admin: [
 
-    'Dashboard',
-
-    'Users',
-
-    'Buildings',
-
-    'Meters',
-
-    'Reports',
-
-    'Events'
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Users', path: '/users' },
+    { name: 'Buildings', path: '/buildings' },
+    { name: 'Meters', path: '/meters' },
+    { name: 'Reports', path: '/reports' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Events', path: '/events' }
   ],
 
   campus_admin: [
 
-    'Dashboard',
-
-    'Users',
-
-    'Meters',
-
-    'Buildings',
-
-    'Events'
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Users', path: '/users' },
+    { name: 'Buildings', path: '/buildings' },
+    { name: 'Meters', path: '/meters' },
+    { name: 'Reports', path: '/reports' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Events', path: '/events' }
   ],
 
   staff: [
 
-    'Dashboard',
-
-    'Meters',
-
-    'Buildings',
-
-    'Approvals'
-  ],
-
-  field_technician: [
-
-    'Dashboard',
-
-    'Submit Reading',
-
-    'History'
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Users', path: '/users' },
+    { name: 'Buildings', path: '/buildings' },
+    { name: 'Meters', path: '/meters' },
+    { name: 'Reports', path: '/reports' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Approvals', path: '/approvals' }
   ],
 
   calendar_admin: [
 
-    'Dashboard',
-
-    'Events',
-
-    'Calendar'
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Events', path: '/events' },
+    { name: 'Calendar', path: '/calendar' }
   ]
 }

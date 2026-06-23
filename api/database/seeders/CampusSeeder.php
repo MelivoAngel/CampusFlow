@@ -10,9 +10,9 @@ class CampusSeeder extends Seeder
     public function run(): void
     {
         DB::table('campuses')->insert([
-            ['name' => 'Lobo Campus', 'code' => 'LOBO'],
-            ['name' => 'Balayan Campus', 'code' => 'BALAYAN'],
             ['name' => 'Alangilan Campus', 'code' => 'ALANGILAN'],
+            ['name' => 'Balayan Campus', 'code' => 'BALAYAN'],
+            ['name' => 'Lobo Campus', 'code' => 'LOBO'],
             ['name' => 'Mabini Campus', 'code' => 'MABINI'],
         ]);
     }
