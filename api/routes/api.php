@@ -13,10 +13,11 @@ Route::prefix('v1')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
     });
 
-    Route::middleware(['auth:sanctum','role:superadmin' ])->get('/test-admin', function () {
+    Route::middleware(['auth:sanctum','role:super_admin' ])->get('/test-admin', function () {
         return response()->json(['message' => 'Access granted']);
     });
 
+    Route::middleware(['auth:sanctum'])->get('/users',[UserController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/users',[UserController::class, 'store']);
     Route::middleware(['auth:sanctum'])->post('/buildings',[BuildingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/buildings/{id}',[BuildingController::class, 'update']);
