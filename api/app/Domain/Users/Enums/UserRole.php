@@ -4,7 +4,7 @@ namespace App\Domain\Users\Enums;
 
 enum UserRole: string
 {
-    case SUPERADMIN = 'superadmin';
+    case SUPER_ADMIN = 'super_admin';
 
     case CAMPUS_ADMIN = 'campus_admin';
 
@@ -18,7 +18,7 @@ enum UserRole: string
     {
         return match ($this) {
 
-            self::SUPERADMIN =>
+            self::SUPER_ADMIN =>
                 in_array(
                     $role,
                     [
@@ -56,7 +56,7 @@ enum UserRole: string
     {
         return match ($this) {
 
-            self::SUPERADMIN => true,
+            self::SUPER_ADMIN => true,
 
             default => false
         };

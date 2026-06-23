@@ -15,9 +15,9 @@ class UserSeeder extends Seeder
 
             [
                 'name' => 'Super Admin',
-                'email' => 'superadmin@campusflow.com',
+                'email' => 'super.admin@campusflow.com',
                 'password' => Hash::make('password'),
-                'role' => UserRole::SUPERADMIN->value,
+                'role' => UserRole::SUPER_ADMIN->value,
                 'campus_id' => null,
                 'created_by' => null,
                 'created_at' => now(),

@@ -13,7 +13,7 @@ class MeterPermission
         return in_array(
             $role,
             [
-                UserRole::SUPERADMIN->value,
+                UserRole::SUPER_ADMIN->value,
                 UserRole::CAMPUS_ADMIN->value,
                 UserRole::STAFF->value
             ]
@@ -25,6 +25,6 @@ class MeterPermission
     ): bool
     {
         return $role ===
-            UserRole::SUPERADMIN->value;
+            UserRole::SUPER_ADMIN->value;
     }
 }
