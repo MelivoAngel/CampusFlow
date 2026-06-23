@@ -21,6 +21,8 @@ use App\Domain\Meters\Services\AnomalyDetectionService;
 use App\Domain\Meters\Services\AnomalyService;
 use App\Domain\Meters\Services\AnomalyLockService;
 use App\Domain\Meters\Services\ResolveAnomalyService;
+use App\Domain\Meters\Policies\ViewMeterReadingsPolicy;
+use App\Domain\Meters\Services\GetMeterReadingsService;
 
 class MeterReadingController
 {
@@ -125,6 +127,35 @@ class MeterReadingController
             'success' => true,
             'message' => 'Reading submitted successfully',
             'data' => $reading
+        ]);
+    }
+    public function index(
+        Request $request,
+        ViewMeterReadingsPolicy $policy,
+        GetMeterReadingsService $service
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        if (! $policy->canView($user)) {
+
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'You are not allowed to view readings'
+            ],403);
+        }
+
+        $readings = $service->get(
+            $user
+        );
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $readings
         ]);
     }
 

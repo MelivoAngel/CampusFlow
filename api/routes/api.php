@@ -27,6 +27,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/meters',[MeterController::class, 'index']);
     Route::middleware(['auth:sanctum'])->patch('/meters/{id}',[MeterController::class, 'update']);
     Route::middleware(['auth:sanctum'])->post('/meter-readings',[MeterReadingController::class, 'store']);
+    Route::middleware(['auth:sanctum'])->get('/meter-readings',[MeterReadingController::class, 'index']);
     Route::middleware(['auth:sanctum'])->put('/meter-readings/{id}',[MeterReadingController::class, 'update']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/correct',[MeterReadingController::class, 'correct']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/approve',[MeterReadingController::class, 'approve']);
