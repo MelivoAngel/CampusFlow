@@ -9,6 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Domain\Users\Policies\ViewUsersPolicy;
 use App\Domain\Users\Services\GetUsersService;
+use App\Domain\Users\Requests\UpdateUserRequest;
+use App\Domain\Users\Services\UpdateUserService;
+use App\Domain\Users\Policies\UserUpdatePolicy;
+use App\Domain\Users\Models\User;
 
 class UserController
 {
@@ -74,6 +78,49 @@ class UserController
         return response()->json([
             'success' => true,
             'data' => $users
+        ]);
+    }
+
+    public function update(
+        Request $request,
+        int $id,
+        UpdateUserRequest $updateUserRequest,
+        UpdateUserService $service,
+        UserUpdatePolicy $policy
+    ): JsonResponse
+    {
+        $editor = auth()->user();
+
+        $user = User::findOrFail(
+            $id
+        );
+
+        if (
+            ! $policy->canUpdate(
+                $editor,
+                $user
+            )
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied'
+            ], 403);
+        }
+
+        $validated = $updateUserRequest->validate(
+            $request->all(),
+            $id
+        );
+
+        $updated = $service->update(
+            $user,
+            $validated
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data' => $updated
         ]);
     }
 }

@@ -48,16 +48,50 @@ class CreateUserRequest
             ]
         ];
 
-        if ($creatorRole->requiresManualCampus()) {
+        if (
+            $creatorRole->requiresManualCampus()
+        ) {
             $rules['campus_id'] = [
                 'required',
                 'exists:campuses,id'
             ];
         }
 
-        return Validator::make(
+        $validated = Validator::make(
             $data,
             $rules
         )->validate();
+
+        if (
+            $validated['role'] ===
+            UserRole::CAMPUS_ADMIN->value
+        ) {
+            $campusId =
+
+                $creatorRole->requiresManualCampus()
+
+                ? $validated['campus_id']
+
+                : $creator->campus_id;
+
+            $exists = User::where(
+                'campus_id',
+                $campusId
+            )->where(
+                'role',
+                UserRole::CAMPUS_ADMIN->value
+            )->exists();
+
+            if ($exists) {
+                abort(
+                    response()->json([
+                        'success' => false,
+                        'message' => 'Campus already has a campus admin'
+                    ], 422)
+                );
+            }
+        }
+
+        return $validated;
     }
 }
