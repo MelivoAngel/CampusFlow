@@ -18,7 +18,10 @@ export const useAuthStore = defineStore(
 
       token: localStorage.getItem('token') || null,
 
-      user: null as User | null
+      user: JSON.parse(
+
+        localStorage.getItem('user') || 'null'
+      ) as User | null
     }),
 
     actions: {
@@ -35,6 +38,11 @@ export const useAuthStore = defineStore(
           'token',
           token
         )
+
+        localStorage.setItem(
+          'user',
+          JSON.stringify(user)
+        )
       },
 
       logout() {
@@ -44,6 +52,10 @@ export const useAuthStore = defineStore(
 
         localStorage.removeItem(
           'token'
+        )
+
+        localStorage.removeItem(
+          'user'
         )
       }
     }

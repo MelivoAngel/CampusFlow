@@ -1,10 +1,18 @@
 <script setup lang="ts">
+
 import Sidebar from '../components/Sidebar.vue'
+
+import { useAuthStore } from '../../stores/authStore'
+
+const authStore =
+  useAuthStore()
+
 </script>
 
 <template>
   <div class="app-container">
 
+    
     <aside>
       <Sidebar />
     </aside>
@@ -12,7 +20,9 @@ import Sidebar from '../components/Sidebar.vue'
     <div class="main-content">
 
       <header>
-        Navbar
+
+        {{ authStore.user?.name }}
+
       </header>
 
       <main>
