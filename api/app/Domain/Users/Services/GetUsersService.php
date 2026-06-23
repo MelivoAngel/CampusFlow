@@ -15,20 +15,37 @@ class GetUsersService
             $user->role ===
             'super_admin'
         ) {
-            return User::all();
+            return User::with(
+                'campus'
+            )->where(
+                'role',
+                '!=',
+                'super_admin'
+            )->get();
         }
 
         if (
             $user->role ===
             'campus_admin'
         ) {
-            return User::where(
+            return User::with(
+                'campus'
+            )->where(
                 'campus_id',
                 $user->campus_id
+            )->whereIn(
+                'role',
+                [
+                    'staff',
+                    'field_technician',
+                    'calendar_admin'
+                ]
             )->get();
         }
 
-        return User::where(
+        return User::with(
+            'campus'
+        )->where(
             'campus_id',
             $user->campus_id
         )->whereIn(

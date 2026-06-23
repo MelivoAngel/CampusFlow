@@ -4,6 +4,7 @@ use App\Domain\Users\Controllers\UserController;
 use App\Domain\Buildings\Controllers\BuildingController;
 use App\Domain\Meters\Controllers\MeterController;
 use App\Domain\Meters\Controllers\MeterReadingController;
+use App\Domain\Campuses\Controllers\CampusController;
 
 Route::prefix('v1')->group(function () {
 
@@ -19,6 +20,7 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware(['auth:sanctum'])->get('/users',[UserController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/users',[UserController::class, 'store']);
+    Route::middleware(['auth:sanctum'])->patch('/users/{id}',[UserController::class,'update']);
     Route::middleware(['auth:sanctum'])->post('/buildings',[BuildingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/buildings/{id}',[BuildingController::class, 'update']);
     Route::middleware(['auth:sanctum'])->post('/meters',[MeterController::class, 'store']);
@@ -26,5 +28,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->put('/meter-readings/{id}',[MeterReadingController::class, 'update']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/correct',[MeterReadingController::class, 'correct']);
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/approve',[MeterReadingController::class, 'approve']);
+    Route::middleware(['auth:sanctum'])->get('/campuses',[CampusController::class, 'index']);
     
 });
