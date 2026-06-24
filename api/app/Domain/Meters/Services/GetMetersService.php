@@ -12,16 +12,24 @@ class GetMetersService
         User $user
     ): Collection
     {
+        $query = Meter::with([
+
+            'assignment.technician:id,name'
+        ]);
+
         if (
             $user->role ===
             'super_admin'
         ) {
-            return Meter::all();
+            return $query->get();
         }
 
-        return Meter::where(
+        return $query->where(
+
             'campus_id',
+
             $user->campus_id
+
         )->get();
     }
 }

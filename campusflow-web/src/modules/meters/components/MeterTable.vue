@@ -10,10 +10,10 @@ defineProps<{
   meters: Meter[]
 }>()
 
-const emit =
-  defineEmits([
-    'edit'
-  ])
+const emit = defineEmits([
+  'edit',
+  'assign'
+])
 
 const authStore =
   useAuthStore()
@@ -55,6 +55,10 @@ const canEdit = computed(() => {
           Resource Type
         </th>
 
+        <th class="text-left py-3">
+          Assigned Technician
+        </th>
+
         <th
           v-if="showCampus"
           class="text-left py-3"
@@ -94,6 +98,13 @@ const canEdit = computed(() => {
           {{ formatLabel(meter.resource_type) }}
         </td>
 
+        <td class="py-4">
+          {{
+            meter.assignment?.technician.name ||
+            'Unassigned'
+          }}
+        </td>
+
         <td
           v-if="showCampus"
           class="py-4"
@@ -110,9 +121,17 @@ const canEdit = computed(() => {
           <button
             v-if="canEdit"
             @click="emit('edit',meter)"
-            class="text-blue-600"
+            class="text-blue-600 mr-3"
           >
             Edit
+          </button>
+
+          <button
+            v-if="canEdit"
+            @click="emit('assign',meter)"
+            class="text-emerald-600"
+          >
+            Assign
           </button>
 
         </td>

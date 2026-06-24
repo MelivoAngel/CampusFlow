@@ -6,6 +6,7 @@ import AppLayout from '../../../shared/layouts/AppLayout.vue'
 import MeterTable from '../components/MeterTable.vue'
 import CreateMeterModal from '../components/CreateMeterModal.vue'
 import EditMeterModal from '../components/EditMeterModal.vue'
+import AssignMeterModal from '../components/AssignMeterModal.vue'
 
 import { getMetersRequest } from '../services/meterApi'
 
@@ -19,6 +20,7 @@ const loading = ref(false)
 
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
+const showAssignModal = ref(false)
 
 const selectedMeter = ref<Meter | null>(null)
 
@@ -48,6 +50,13 @@ const handleEdit = (
 ) => {
   selectedMeter.value = meter
   showEditModal.value = true
+}
+
+const handleAssign = (
+  meter: Meter
+) => {
+  selectedMeter.value = meter
+  showAssignModal.value = true
 }
 
 onMounted(() => fetchMeters())
@@ -92,6 +101,7 @@ onMounted(() => fetchMeters())
         v-else
         :meters="meters"
         @edit="handleEdit"
+        @assign="handleAssign"
       />
 
       <CreateMeterModal
@@ -104,6 +114,13 @@ onMounted(() => fetchMeters())
         :show="showEditModal"
         :meter="selectedMeter"
         @close="showEditModal = false"
+        @updated="fetchMeters"
+      />
+
+      <AssignMeterModal
+        :show="showAssignModal"
+        :meter="selectedMeter"
+        @close="showAssignModal = false"
         @updated="fetchMeters"
       />
 

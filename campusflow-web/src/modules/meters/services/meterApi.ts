@@ -19,5 +19,22 @@ export const updateMeterRequest = (
   id: number,
   data: UpdateMeterPayload
 ) => {
-  return api.patch(`/v1/meters/${id}`,data)
+  return api.patch(
+    `/v1/meters/${id}`,
+    data
+  )
+}
+
+export const assignMeterRequest = (
+  meterId: number,
+  technicianId: number
+) => {
+  return api.patch(
+
+    `/v1/meters/${meterId}/assign`,
+
+    {
+      technician_id: technicianId
+    }
+  )
 }
