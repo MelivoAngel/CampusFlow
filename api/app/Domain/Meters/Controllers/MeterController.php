@@ -77,6 +77,50 @@ class MeterController
         ]);
     }
 
+    public function mobile(
+        Request $request
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        if (
+            $user->role !==
+            'field_technician'
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+            ],403);
+        }
+
+        $meters = Meter::where(
+
+            'campus_id',
+            $user->campus_id
+
+        )->where(
+
+            'is_active',
+            true
+
+        )->select(
+
+            'id',
+            'name',
+            'resource_type'
+
+        )->get();
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $meters
+        ]);
+    }
+
     public function update(
         Request $request,
         int $id,

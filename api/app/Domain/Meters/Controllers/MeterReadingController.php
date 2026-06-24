@@ -159,6 +159,72 @@ class MeterReadingController
         ]);
     }
 
+    public function myReadings(
+        Request $request
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        if (
+            $user->role !==
+            'field_technician'
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+            ],403);
+        }
+
+        $readings = MeterReading::with([
+
+            'meter:id,name,resource_type',
+
+            'anomaly:id,meter_reading_id,type,severity,message,is_resolved'
+
+        ])->where(
+
+            'technician_id',
+            $user->id
+
+        )->select([
+
+            'id',
+
+            'meter_id',
+
+            'current_reading',
+
+            'consumption',
+
+            'recorded_date',
+
+            'is_approved',
+
+            'was_corrected'
+
+        ])->latest()->get();
+
+        $readings->each(function (
+            $reading
+        ) {
+            if ($reading->anomaly) {
+
+                unset(
+                    $reading->anomaly->meter_reading_id
+                );
+            }
+        });
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $readings
+        ]);
+    }
+
     public function update(
         Request $request,
         int $id,
