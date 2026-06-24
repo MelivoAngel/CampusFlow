@@ -19,4 +19,15 @@ export interface Meter {
     name: string
 
   } | null
+
+  assignment: {
+
+    technician: {
+
+      id: number
+
+      name: string
+    }
+
+  } | null
 }
