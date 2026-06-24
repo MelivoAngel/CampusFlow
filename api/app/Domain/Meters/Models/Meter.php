@@ -57,4 +57,11 @@ class Meter extends Model
             'building_meter'
         );
     }
+
+    public function assignment()
+    {
+        return $this->hasOne(
+            MeterAssignment::class
+        );
+    }
 }

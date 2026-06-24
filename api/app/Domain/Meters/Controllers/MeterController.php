@@ -13,6 +13,8 @@ use App\Domain\Meters\Services\GetMetersService;
 use App\Domain\Meters\Requests\UpdateMeterRequest;
 use App\Domain\Meters\Policies\UpdateMeterPolicy;
 use App\Domain\Meters\Services\UpdateMeterService;
+use App\Domain\Meters\Models\MeterAssignment;
+use App\Domain\Users\Models\User;
 
 class MeterController
 {
@@ -95,20 +97,29 @@ class MeterController
             ],403);
         }
 
-        $meters = Meter::where(
+        $meters = Meter::whereHas(
 
-            'campus_id',
-            $user->campus_id
+            'assignment',
+
+            fn ($query) => $query->where(
+
+                'technician_id',
+
+                $user->id
+            )
 
         )->where(
 
             'is_active',
+
             true
 
         )->select(
 
             'id',
+
             'name',
+
             'resource_type'
 
         )->get();
@@ -162,6 +173,101 @@ class MeterController
             'success' => true,
             'message' => 'Meter updated successfully',
             'data' => $updated
+        ]);
+    }
+
+    public function assign(
+        Request $request,
+        int $id
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        if (
+            ! in_array(
+
+                $user->role,
+
+                ['campus_admin','staff']
+            )
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+            ],403);
+        }
+
+        $meter = Meter::findOrFail(
+            $id
+        );
+
+        if (
+            $user->campus_id !==
+            $meter->campus_id &&
+            $user->role !==
+            'super_admin'
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'You cannot assign this meter'
+            ],403);
+        }
+
+        $technician = User::where(
+
+            'id',
+            $request->technician_id
+
+        )->where(
+
+            'role',
+            'field_technician'
+
+        )->first();
+
+        if (! $technician) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Invalid technician'
+            ],422);
+        }
+
+        if (
+            $technician->campus_id !==
+            $meter->campus_id
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Technician must belong to same campus'
+            ],422);
+        }
+
+        MeterAssignment::updateOrCreate(
+
+            [
+                'meter_id' => $meter->id
+            ],
+
+            [
+                'technician_id' => $technician->id,
+
+                'assigned_by' => $user->id
+            ]
+        );
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' => 'Meter assigned successfully'
         ]);
     }
 }
