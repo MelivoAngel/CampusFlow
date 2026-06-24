@@ -4,6 +4,7 @@ import { ref,onMounted } from 'vue'
 import AppLayout from '../../../shared/layouts/AppLayout.vue'
 import ApprovalTable from '../components/ApprovalTable.vue'
 import CorrectApprovalModal from '../components/CorrectApprovalModal.vue'
+import ConfirmModal from '../../../shared/components/ConfirmModal.vue'
 
 import {
   getApprovalsRequest,
@@ -15,7 +16,10 @@ import type { Approval } from '../types/approval'
 const approvals = ref<Approval[]>([])
 const loading = ref(false)
 
-const showModal = ref(false)
+const showCorrectModal = ref(false)
+const showConfirmModal = ref(false)
+
+const selectedId = ref<number | null>(null)
 const selectedApproval = ref<Approval | null>(null)
 
 const fetchApprovals = async () => {
@@ -33,24 +37,39 @@ const fetchApprovals = async () => {
   loading.value = false
 }
 
-const handleApprove = async (
+const openApproveConfirm = (
   id: number
 ) => {
+  selectedId.value = id
+  showConfirmModal.value = true
+}
+
+const confirmApprove = async () => {
+  if (!selectedId.value) {
+    return
+  }
+
   try {
-    await approveRequest(id)
+    await approveRequest(
+      selectedId.value
+    )
+
     fetchApprovals()
   }
 
   catch (error) {
     console.log(error)
   }
+
+  showConfirmModal.value = false
+  selectedId.value = null
 }
 
 const handleCorrect = (
   approval: Approval
 ) => {
   selectedApproval.value = approval
-  showModal.value = true
+  showCorrectModal.value = true
 }
 
 onMounted(() => fetchApprovals())
@@ -86,15 +105,23 @@ onMounted(() => fetchApprovals())
       <ApprovalTable
         v-else
         :approvals="approvals"
-        @approve="handleApprove"
+        @approve="openApproveConfirm"
         @correct="handleCorrect"
       />
 
       <CorrectApprovalModal
-        :show="showModal"
+        :show="showCorrectModal"
         :approval="selectedApproval"
-        @close="showModal = false"
+        @close="showCorrectModal = false"
         @updated="fetchApprovals"
+      />
+
+      <ConfirmModal
+        :show="showConfirmModal"
+        title="Approve Reading"
+        message="Are you sure you want to approve this reading?"
+        @close="showConfirmModal = false"
+        @confirm="confirmApprove"
       />
 
     </div>

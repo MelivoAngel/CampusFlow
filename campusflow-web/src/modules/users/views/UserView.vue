@@ -8,6 +8,7 @@ import CreateUserModal from '../components/CreateUserModal.vue'
 import EditUserModal from '../components/EditUserModal.vue'
 
 import { getUsersRequest } from '../services/userApi'
+
 import { adminRoles } from '../../../constants/roles'
 import type { User } from '../../../types/user'
 
@@ -20,7 +21,7 @@ const users =
 const loading =
   ref(false)
 
-const showModal =
+const showCreateModal =
   ref(false)
 
 const showEditModal =
@@ -30,17 +31,13 @@ const selectedUser =
   ref<User | null>(null)
 
 const canCreate = computed(() => {
-
   return adminRoles.includes(
-
     authStore.user?.role || ''
   )
 })
 
 const fetchUsers = async () => {
-
-  loading.value =
-    true
+  loading.value = true
 
   try {
     const response =
@@ -54,14 +51,12 @@ const fetchUsers = async () => {
     console.log(error)
   }
 
-  loading.value =
-    false
+  loading.value = false
 }
 
 const handleEdit = (
   user: User
 ) => {
-
   selectedUser.value =
     user
 
@@ -87,7 +82,7 @@ onMounted(() => {
 
         <button
           v-if="canCreate"
-          @click="showModal = true"
+          @click="showCreateModal = true"
           class="bg-emerald-700 text-white px-4 py-2 rounded-md"
         >
           Add User
@@ -116,8 +111,8 @@ onMounted(() => {
       />
 
       <CreateUserModal
-        :show="showModal"
-        @close="showModal = false"
+        :show="showCreateModal"
+        @close="showCreateModal = false"
         @created="fetchUsers"
       />
 

@@ -10,8 +10,13 @@ const emit = defineEmits([
   'correct'
 ])
 
-const getStatus = (approval: Approval) => {
-  if (approval.anomaly) return 'Anomaly'
+const getStatus = (
+  approval: Approval
+) => {
+  if (approval.anomaly) {
+    return 'Anomaly'
+  }
+
   return 'Pending'
 }
 </script>
