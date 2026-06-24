@@ -38,6 +38,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->patch('/meter-anomalies/{id}/resolve',[MeterAnomalyController::class,'resolve']);
     Route::middleware(['auth:sanctum'])->get('/mobile/meters',[MeterController::class,'mobile']);
     Route::middleware(['auth:sanctum'])->get('/my-readings',[MeterReadingController::class,'myReadings']);
+    Route::middleware(['auth:sanctum'])->get('/my-pending-readings',[MeterReadingController::class,'myPendingReadings']);
     Route::middleware(['auth:sanctum'])->get('/campuses',[CampusController::class, 'index']);
+
     
 });

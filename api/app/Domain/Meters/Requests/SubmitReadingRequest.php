@@ -29,6 +29,11 @@ class SubmitReadingRequest
                     'required',
                     'image',
                     'max:5120'
+                ],
+
+                'captured_at' => [
+                    'nullable',
+                    'date'
                 ]
             ]
         )->validate();

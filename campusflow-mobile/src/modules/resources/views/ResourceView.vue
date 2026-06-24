@@ -3,6 +3,11 @@ import { useRouter } from 'vue-router'
 
 import {
   IonPage,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -27,10 +32,32 @@ const goToMeters = (
 
   <ion-page>
 
+    <ion-header>
+
+      <ion-toolbar>
+
+        <ion-buttons slot="start">
+
+          <ion-back-button defaultHref="/dashboard" />
+
+        </ion-buttons>
+
+        <ion-title>
+
+          Resources
+
+        </ion-title>
+
+      </ion-toolbar>
+
+    </ion-header>
+
     <ion-content class="ion-padding">
 
       <h2>
+
         Select Resource
+
       </h2>
 
       <ion-card
@@ -40,7 +67,9 @@ const goToMeters = (
         <ion-card-header>
 
           <ion-card-title>
+
             Water
+
           </ion-card-title>
 
         </ion-card-header>
@@ -54,7 +83,9 @@ const goToMeters = (
         <ion-card-header>
 
           <ion-card-title>
+
             Electricity
+
           </ion-card-title>
 
         </ion-card-header>
@@ -68,7 +99,9 @@ const goToMeters = (
         <ion-card-header>
 
           <ion-card-title>
+
             Waste
+
           </ion-card-title>
 
         </ion-card-header>

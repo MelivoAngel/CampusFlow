@@ -5,6 +5,11 @@ import { useRoute,useRouter } from 'vue-router'
 
 import {
   IonPage,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonTitle,
   IonContent,
   IonCard,
   IonCardHeader,
@@ -58,13 +63,20 @@ const fetchMeters = async () => {
 }
 
 const handleSelectMeter = (
-  meterId: number
+  meter: Meter
 ) => {
 
-  router.push(
+  router.push({
 
-    `/submit-reading/${meterId}`
-  )
+    path:
+      `/submit-reading/${meter.id}`,
+
+    query: {
+
+      name:
+        meter.name
+    }
+  })
 }
 
 onMounted(() => {
@@ -76,6 +88,26 @@ onMounted(() => {
 <template>
 
   <ion-page>
+
+    <ion-header>
+
+      <ion-toolbar>
+
+        <ion-buttons slot="start">
+
+          <ion-back-button />
+
+        </ion-buttons>
+
+        <ion-title>
+
+          Meters
+
+        </ion-title>
+
+      </ion-toolbar>
+
+    </ion-header>
 
     <ion-content class="ion-padding">
 
@@ -97,7 +129,7 @@ onMounted(() => {
 
       </p>
 
-      <ion-card :button="true" v-for="meter in meters" :key="meter.id" @click="handleSelectMeter(meter.id)">
+      <ion-card :button="true" v-for="meter in meters" :key="meter.id" @click="handleSelectMeter(meter)">
 
         <ion-card-header>
 

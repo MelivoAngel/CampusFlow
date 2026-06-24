@@ -1,41 +1,119 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,computed,onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 import {
   IonPage,
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonTitle,
   IonContent,
   IonInput,
   IonButton
 } from '@ionic/vue'
 
-import { Camera, CameraResultType} from '@capacitor/camera' 
+import {
+  Camera,
+  CameraResultType
+} from '@capacitor/camera'
 
 import {
-  submitReadingRequest
+  Network
+} from '@capacitor/network'
+
+import {
+  submitReadingRequest,
+  updateReadingRequest
 } from '../services/readingApi'
 
 const route =
   useRoute()
 
+const isEditMode =
+  computed(() => {
+
+    return route.path.includes(
+      'edit-reading'
+    )
+  })
+
 const meterId =
   Number(
-    route.params.meterId
+    route.params.meterId || 0
+  )
+
+const readingId =
+  Number(
+    route.params.readingId || 0
+  )
+
+const meterName =
+  String(
+    route.query.name || ''
   )
 
 const currentReading =
-  ref('')
+  ref(
+
+    String(
+      route.query.value || ''
+    )
+  )
 
 const photo =
-  ref<File | null>(null)
+  ref<File | null>(
+    null
+  )
 
 const loading =
   ref(false)
 
+const title =
+  computed(() => {
+
+    return isEditMode.value
+
+      ? 'Edit Reading'
+
+      : 'Submit Reading'
+  })
+
+const buttonText =
+  computed(() => {
+
+    return isEditMode.value
+
+      ? 'Update Reading'
+
+      : 'Submit Reading'
+  })
+
+const checkNetwork = async () => {
+
+  const status =
+    await Network.getStatus()
+
+  console.log(
+
+    'connected:',
+
+    status.connected
+  )
+}
+
 const handlePhoto = async () => {
 
   try {
-    const image = await Camera.getPhoto({ quality: 90, resultType:CameraResultType.DataUrl})
+    const image =
+      await Camera.getPhoto({
+
+        quality: 90,
+
+        resultType:
+          CameraResultType.DataUrl
+      })
 
     if (! image.dataUrl) {
       return
@@ -69,38 +147,74 @@ const handlePhoto = async () => {
 
 const handleSubmit = async () => {
 
+  if (! currentReading.value) {
+    return
+  }
+
   if (
-    ! currentReading.value ||
+    ! isEditMode.value &&
     ! photo.value
   ) {
     return
   }
 
-  loading.value = true
+  loading.value =
+    true
 
   const formData =
     new FormData()
 
   formData.append(
-    'meter_id',
-    String(meterId)
-  )
 
-  formData.append(
     'current_reading',
+
     currentReading.value
   )
 
-  formData.append(
-    'photo',
-    photo.value
-  )
+  if (photo.value) {
+
+    formData.append(
+
+      'photo',
+
+      photo.value
+    )
+  }
 
   try {
-    const response =
-      await submitReadingRequest(
-        formData
+
+    let response
+
+    if (
+      isEditMode.value
+    ) {
+
+      response =
+        await updateReadingRequest(
+
+          readingId,
+
+          formData
+        )
+    }
+
+    else {
+
+      formData.append(
+
+        'meter_id',
+
+        String(
+          meterId
+        )
       )
+
+      response =
+        await submitReadingRequest(
+
+          formData
+        )
+    }
 
     console.log(
       response.data
@@ -117,13 +231,39 @@ const handleSubmit = async () => {
     console.log(error)
   }
 
-  loading.value = false
+  loading.value =
+    false
 }
+
+onMounted(() => {
+
+  checkNetwork()
+})
 </script>
 
 <template>
 
   <ion-page>
+
+    <ion-header>
+
+      <ion-toolbar>
+
+        <ion-buttons slot="start">
+
+          <ion-back-button defaultHref="/dashboard" />
+
+        </ion-buttons>
+
+        <ion-title>
+
+          {{ title }}
+
+        </ion-title>
+
+      </ion-toolbar>
+
+    </ion-header>
 
     <ion-content class="ion-padding">
 
@@ -131,14 +271,13 @@ const handleSubmit = async () => {
 
         <h2>
 
-          Submit Reading
+          {{ title }}
 
         </h2>
 
         <p>
 
-          Meter #
-          {{ meterId }}
+          {{ meterName }}
 
         </p>
 
@@ -152,15 +291,18 @@ const handleSubmit = async () => {
           expand="block"
           @click="handlePhoto"
         >
+
           {{ photo ? 'Photo Ready' : 'Take Photo' }}
+
         </ion-button>
 
         <ion-button
           expand="block"
-          :disabled="!currentReading || !photo"
           @click="handleSubmit"
         >
-          {{ loading ? 'Submitting...' : 'Submit Reading' }}
+
+          {{ loading ? 'Loading...' : buttonText }}
+
         </ion-button>
 
       </div>

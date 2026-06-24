@@ -17,7 +17,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'photo_path',
     'is_approved',
     'was_corrected',
-    'recorded_date'
+    'recorded_date',
+    'captured_at'
 ])]
 class MeterReading extends Model
 {

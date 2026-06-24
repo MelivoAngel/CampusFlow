@@ -18,3 +18,16 @@ export const submitReadingRequest = (
     }
   )
 }
+
+export const updateReadingRequest = (
+  id: number,
+  data: FormData
+) => {
+
+  return api.put(
+
+    `/v1/meter-readings/${id}`,
+
+    data
+  )
+}

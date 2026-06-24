@@ -35,13 +35,22 @@ class MeterReadingService
         string $photoPath
     ): MeterReading
     {
+        $capturedAt =
+
+            $validated['captured_at']
+
+            ?? now();
+
         return MeterReading::create([
 
-            'meter_id' => $validated['meter_id'],
+            'meter_id' =>
+                $validated['meter_id'],
 
-            'technician_id' => $user->id,
+            'technician_id' =>
+                $user->id,
 
-            'updated_by' => $user->id,
+            'updated_by' =>
+                $user->id,
 
             'previous_reading' =>
                 $lastReading?->current_reading ?? 0,
@@ -56,7 +65,18 @@ class MeterReadingService
                 $photoPath,
 
             'recorded_date' =>
-                now()->toDateString()
+                date(
+
+                    'Y-m-d',
+
+                    strtotime(
+
+                        (string) $capturedAt
+                    )
+                ),
+
+            'captured_at' =>
+                $capturedAt
         ]);
     }
 }
