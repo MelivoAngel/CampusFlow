@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->post('/meters',[MeterController::class, 'store']);
     Route::middleware(['auth:sanctum'])->get('/meters',[MeterController::class, 'index']);
     Route::middleware(['auth:sanctum'])->patch('/meters/{id}',[MeterController::class, 'update']);
+    Route::middleware(['auth:sanctum'])->patch('/meters/{id}/assign',[MeterController::class,'assign']);
     Route::middleware(['auth:sanctum'])->post('/meter-readings',[MeterReadingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->get('/meter-readings',[MeterReadingController::class, 'index']);
     Route::middleware(['auth:sanctum'])->put('/meter-readings/{id}',[MeterReadingController::class, 'update']);
@@ -35,6 +36,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->patch('/meter-readings/{id}/approve',[MeterReadingController::class, 'approve']);
     Route::middleware(['auth:sanctum'])->get('/meter-anomalies',[MeterAnomalyController::class,'index']);
     Route::middleware(['auth:sanctum'])->patch('/meter-anomalies/{id}/resolve',[MeterAnomalyController::class,'resolve']);
+    Route::middleware(['auth:sanctum'])->get('/mobile/meters',[MeterController::class,'mobile']);
+    Route::middleware(['auth:sanctum'])->get('/my-readings',[MeterReadingController::class,'myReadings']);
     Route::middleware(['auth:sanctum'])->get('/campuses',[CampusController::class, 'index']);
     
 });

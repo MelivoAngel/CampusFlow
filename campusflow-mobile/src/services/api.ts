@@ -3,16 +3,12 @@ import axios from 'axios'
 const api = axios.create({
 
   baseURL:
-    'http://172.16.177.128:8000/api',
-
-  headers: {
-    Accept: 'application/json'
-  }
+    'http://172.16.177.128:8000/api'
 })
 
 api.interceptors.request.use(
 
-  (config) => {
+  config => {
 
     const token =
       localStorage.getItem(
@@ -20,6 +16,7 @@ api.interceptors.request.use(
       )
 
     if (token) {
+
       config.headers.Authorization =
         `Bearer ${token}`
     }
