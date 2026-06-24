@@ -1,54 +1,28 @@
-import {
-  createRouter,
-  createWebHistory
-} from '@ionic/vue-router'
+import { createRouter,createWebHistory } from '@ionic/vue-router'
 
 import LoginView from '../modules/auth/views/LoginView.vue'
+import ResourceView from '../modules/resources/views/ResourceView.vue'
 import MeterView from '../modules/meters/views/MeterView.vue'
+import SubmitReadingView from '../modules/readings/views/SubmitReadingView.vue'
 
 const routes = [
 
-  { path: '/',redirect: '/login' },
+  {path: '/',redirect: '/login'},
+  {path: '/login',name: 'login',component: LoginView},
+  {path: '/resources',name: 'resources',component: ResourceView},
+  {path: '/meters/:resource',name: 'meters',component: MeterView},
+  {path: '/submit-reading/:meterId',name: 'submit-reading',component: SubmitReadingView}
 
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginView
-  },
-
-  {
-    path: '/meters',
-    name: 'meters',
-    component: MeterView
-  }
 ]
 
-const router = createRouter({
-
-  history: createWebHistory(
-    import.meta.env.BASE_URL
-  ),
-
-  routes
-})
+const router = createRouter({history: createWebHistory(import.meta.env.BASE_URL),routes})
 
 router.beforeEach((to) => {
 
-  const token =
-    localStorage.getItem('token')
+  const token =localStorage.getItem('token')
 
-  if (
-    to.name !== 'login' &&
-    !token
-  ) {
-    return { name: 'login' }
-  }
-
-  if (
-    to.name === 'login' &&
-    token
-  ) {
-    return { name: 'meters' }
+  if (to.name !== 'login' &&! token) {
+    return {name: 'login'}
   }
 })
 

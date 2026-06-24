@@ -28,17 +28,8 @@ const loading =
   ref(false)
 
 const handleLogin = async () => {
+
   loading.value = true
-
-  console.log(
-    'email:',
-    email.value
-  )
-
-  console.log(
-    'password:',
-    password.value
-  )
 
   try {
     const response =
@@ -66,16 +57,14 @@ const handleLogin = async () => {
 
       user
     )
+    
 
-    router.push('/meters')
+    router.push(
+      '/resources'
+    )
   }
 
-  catch (error: any) {
-
-    console.log(
-      error.response?.data
-    )
-
+  catch (error) {
     console.log(error)
   }
 
