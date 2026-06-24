@@ -1,4 +1,4 @@
-const adminMenu = [
+const adminManagement = [
 
   {
     section: '',
@@ -23,17 +23,6 @@ const adminMenu = [
   },
 
   {
-    section: 'Operations',
-
-    items: [
-
-      { name: 'Reading Queue', path: '/reading-queue' },
-
-      { name: 'Anomalies', path: '/anomalies' }
-    ]
-  },
-
-  {
     section: 'Insights',
 
     items: [
@@ -45,11 +34,25 @@ const adminMenu = [
   }
 ]
 
+const operationsMenu = [
+
+  {
+    section: 'Operations',
+
+    items: [
+
+      { name: 'Approvals', path: '/approvals' },
+
+      { name: 'Anomalies', path: '/anomalies' }
+    ]
+  }
+]
+
 export const menu = {
 
   super_admin: [
 
-    ...adminMenu,
+    ...adminManagement,
 
     {
       section: 'Calendar',
@@ -63,7 +66,9 @@ export const menu = {
 
   campus_admin: [
 
-    ...adminMenu,
+    ...adminManagement,
+
+    ...operationsMenu,
 
     {
       section: 'Calendar',
@@ -77,7 +82,9 @@ export const menu = {
 
   staff: [
 
-    ...adminMenu
+    ...adminManagement,
+
+    ...operationsMenu
   ],
 
   calendar_admin: [

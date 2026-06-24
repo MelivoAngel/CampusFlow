@@ -12,67 +12,45 @@ import { getMetersRequest } from '../services/meterApi'
 import { adminRoles } from '../../../constants/roles'
 import type { Meter } from '../../../types/meter'
 
-const authStore =
-  useAuthStore()
+const authStore = useAuthStore()
 
-const meters =
-  ref<Meter[]>([])
+const meters = ref<Meter[]>([])
+const loading = ref(false)
 
-const loading =
-  ref(false)
+const showCreateModal = ref(false)
+const showEditModal = ref(false)
 
-const showModal =
-  ref(false)
-
-const showEditModal =
-  ref(false)
-
-const selectedMeter =
-  ref<Meter | null>(null)
+const selectedMeter = ref<Meter | null>(null)
 
 const canCreate = computed(() => {
-
   return adminRoles.includes(
-
     authStore.user?.role || ''
   )
 })
 
 const fetchMeters = async () => {
-
-  loading.value =
-    true
+  loading.value = true
 
   try {
-    const response =
-      await getMetersRequest()
-
-    meters.value =
-      response.data.data
+    const response = await getMetersRequest()
+    meters.value = response.data.data
   }
 
   catch (error) {
     console.log(error)
   }
 
-  loading.value =
-    false
+  loading.value = false
 }
 
 const handleEdit = (
   meter: Meter
 ) => {
-
-  selectedMeter.value =
-    meter
-
-  showEditModal.value =
-    true
+  selectedMeter.value = meter
+  showEditModal.value = true
 }
 
-onMounted(() => {
-  fetchMeters()
-})
+onMounted(() => fetchMeters())
 </script>
 
 <template>
@@ -88,7 +66,7 @@ onMounted(() => {
 
         <button
           v-if="canCreate"
-          @click="showModal = true"
+          @click="showCreateModal = true"
           class="bg-emerald-700 text-white px-4 py-2 rounded-md"
         >
           Add Meter
@@ -117,8 +95,8 @@ onMounted(() => {
       />
 
       <CreateMeterModal
-        :show="showModal"
-        @close="showModal = false"
+        :show="showCreateModal"
+        @close="showCreateModal = false"
         @created="fetchMeters"
       />
 
