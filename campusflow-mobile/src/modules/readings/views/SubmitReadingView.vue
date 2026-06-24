@@ -9,6 +9,12 @@ import {
   IonButton
 } from '@ionic/vue'
 
+import { Camera, CameraResultType} from '@capacitor/camera' 
+
+import {
+  submitReadingRequest
+} from '../services/readingApi'
+
 const route =
   useRoute()
 
@@ -22,6 +28,97 @@ const currentReading =
 
 const photo =
   ref<File | null>(null)
+
+const loading =
+  ref(false)
+
+const handlePhoto = async () => {
+
+  try {
+    const image = await Camera.getPhoto({ quality: 90, resultType:CameraResultType.DataUrl})
+
+    if (! image.dataUrl) {
+      return
+    }
+
+    const response =
+      await fetch(
+        image.dataUrl
+      )
+
+    const blob =
+      await response.blob()
+
+    photo.value =
+      new File(
+
+        [blob],
+
+        'reading.jpg',
+
+        {
+          type: 'image/jpeg'
+        }
+      )
+  }
+
+  catch (error) {
+    console.log(error)
+  }
+}
+
+const handleSubmit = async () => {
+
+  if (
+    ! currentReading.value ||
+    ! photo.value
+  ) {
+    return
+  }
+
+  loading.value = true
+
+  const formData =
+    new FormData()
+
+  formData.append(
+    'meter_id',
+    String(meterId)
+  )
+
+  formData.append(
+    'current_reading',
+    currentReading.value
+  )
+
+  formData.append(
+    'photo',
+    photo.value
+  )
+
+  try {
+    const response =
+      await submitReadingRequest(
+        formData
+      )
+
+    console.log(
+      response.data
+    )
+
+    currentReading.value =
+      ''
+
+    photo.value =
+      null
+  }
+
+  catch (error) {
+    console.log(error)
+  }
+
+  loading.value = false
+}
 </script>
 
 <template>
@@ -53,15 +150,17 @@ const photo =
 
         <ion-button
           expand="block"
+          @click="handlePhoto"
         >
-          Take Photo
+          {{ photo ? 'Photo Ready' : 'Take Photo' }}
         </ion-button>
 
         <ion-button
           expand="block"
-          :disabled="!currentReading"
+          :disabled="!currentReading || !photo"
+          @click="handleSubmit"
         >
-          Submit Reading
+          {{ loading ? 'Submitting...' : 'Submit Reading' }}
         </ion-button>
 
       </div>
