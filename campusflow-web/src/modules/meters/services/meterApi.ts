@@ -38,3 +38,12 @@ export const assignMeterRequest = (
     }
   )
 }
+
+export const deleteMeterRequest = (
+  id: number
+) => {
+
+  return api.delete(
+    `v1/meters/${id}`
+  )
+}

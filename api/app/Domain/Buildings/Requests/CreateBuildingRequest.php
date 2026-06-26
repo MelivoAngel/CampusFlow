@@ -21,17 +21,6 @@ class CreateBuildingRequest
                 'max:255'
             ],
 
-            'code' => [
-                'required',
-                'string',
-                'max:50'
-            ],
-
-            'type' => [
-                'nullable',
-                'string'
-            ],
-
             'description' => [
                 'nullable',
                 'string'
@@ -44,14 +33,19 @@ class CreateBuildingRequest
             )
         ) {
             $rules['campus_id'] = [
+
                 'required',
+
                 'exists:campuses,id'
             ];
         }
 
         return Validator::make(
+
             $data,
+
             $rules
+
         )->validate();
     }
 }

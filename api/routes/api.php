@@ -23,11 +23,17 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/users',[UserController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/users',[UserController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/users/{id}',[UserController::class,'update']);
+    Route::middleware(['auth:sanctum'])->delete('/users/{id}',[UserController::class,'destroy']);
+    Route::middleware(['auth:sanctum'])->get('/buildings',[BuildingController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/buildings',[BuildingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/buildings/{id}',[BuildingController::class, 'update']);
+    Route::middleware(['auth:sanctum'])->delete('/buildings/{id}',[BuildingController::class,'destroy']);
+    Route::middleware(['auth:sanctum'])->get('/buildings/{id}/available-meters',[BuildingController::class, 'availableMeters']);
+    Route::middleware(['auth:sanctum'])->patch('/buildings/{id}/assign-meters',[BuildingController::class, 'assignMeters']);
     Route::middleware(['auth:sanctum'])->post('/meters',[MeterController::class, 'store']);
     Route::middleware(['auth:sanctum'])->get('/meters',[MeterController::class, 'index']);
     Route::middleware(['auth:sanctum'])->patch('/meters/{id}',[MeterController::class, 'update']);
+    Route::middleware(['auth:sanctum'])->delete('/meters/{id}',[MeterController::class,'destroy']);
     Route::middleware(['auth:sanctum'])->patch('/meters/{id}/assign',[MeterController::class,'assign']);
     Route::middleware(['auth:sanctum'])->post('/meter-readings',[MeterReadingController::class, 'store']);
     Route::middleware(['auth:sanctum'])->get('/meter-readings',[MeterReadingController::class, 'index']);

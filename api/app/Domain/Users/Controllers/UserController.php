@@ -123,4 +123,39 @@ class UserController
             'data' => $updated
         ]);
     }
+
+    public function destroy(Request $request,int $id): JsonResponse
+    {
+        $currentUser =
+            $request->user();
+
+        $user =
+            User::findOrFail(
+                $id
+            );
+
+        if (
+            $user->id ===
+            $currentUser->id
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'You cannot delete your own account'
+
+            ],422);
+        }
+
+        $user->delete();
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' =>
+                'User deleted successfully'
+        ]);
+    }
 }

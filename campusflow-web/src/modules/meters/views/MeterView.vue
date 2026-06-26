@@ -7,29 +7,64 @@ import MeterTable from '../components/MeterTable.vue'
 import CreateMeterModal from '../components/CreateMeterModal.vue'
 import EditMeterModal from '../components/EditMeterModal.vue'
 import AssignMeterModal from '../components/AssignMeterModal.vue'
+import DeleteMeterModal from '../components/DeleteMeterModal.vue'
 
 import { getMetersRequest } from '../services/meterApi'
+import { getCampusesRequest } from '../../users/services/userApi'
 
 import { adminRoles } from '../../../constants/roles'
+
 import type { Meter } from '../../../types/meter'
+import type { Campus } from '../../../types/campus'
 
-const authStore = useAuthStore()
+const authStore =
+  useAuthStore()
 
-const meters = ref<Meter[]>([])
-const loading = ref(false)
+const meters =
+  ref<Meter[]>([])
 
-const search = ref('')
-const filterType = ref('')
+const campuses =
+  ref<Campus[]>([])
 
-const showCreateModal = ref(false)
-const showEditModal = ref(false)
-const showAssignModal = ref(false)
+const loading =
+  ref(false)
 
-const selectedMeter = ref<Meter | null>(null)
+const search =
+  ref('')
+
+const filterType =
+  ref('')
+
+const campusFilter =
+  ref('')
+
+const showCreateModal =
+  ref(false)
+
+const showEditModal =
+  ref(false)
+
+const showAssignModal =
+  ref(false)
+
+const showDeleteModal =
+  ref(false)
+
+const selectedMeter =
+  ref<Meter | null>(null)
 
 const canCreate = computed(() => {
+
   return adminRoles.includes(
     authStore.user?.role || ''
+  )
+})
+
+const isSuperAdmin = computed(() => {
+
+  return (
+    authStore.user?.role ===
+    'super_admin'
   )
 })
 
@@ -61,47 +96,114 @@ const filteredMeters = computed(() => {
         meter.resource_type ===
         filterType.value
 
+      const matchesCampus =
+
+        !campusFilter.value ||
+
+        meter.campus?.id ===
+        Number(
+          campusFilter.value
+        )
+
       return (
+
         matchesSearch &&
-        matchesType
+
+        matchesType &&
+
+        matchesCampus
       )
     }
   )
 })
 
 const fetchMeters = async () => {
-  loading.value = true
+
+  loading.value =
+    true
 
   try {
-    const response = await getMetersRequest()
-    meters.value = response.data.data
+
+    const response =
+      await getMetersRequest()
+
+    meters.value =
+      response.data.data
   }
 
   catch (error) {
     console.log(error)
   }
 
-  loading.value = false
+  loading.value =
+    false
+}
+
+const fetchCampuses = async () => {
+
+  if (
+    !isSuperAdmin.value
+  ) {
+    return
+  }
+
+  try {
+
+    const response =
+      await getCampusesRequest()
+
+    campuses.value =
+      response.data.data
+  }
+
+  catch (error) {
+    console.log(error)
+  }
 }
 
 const handleEdit = (
   meter: Meter
 ) => {
-  selectedMeter.value = meter
-  showEditModal.value = true
+
+  selectedMeter.value =
+    meter
+
+  showEditModal.value =
+    true
 }
 
 const handleAssign = (
   meter: Meter
 ) => {
-  selectedMeter.value = meter
-  showAssignModal.value = true
+
+  selectedMeter.value =
+    meter
+
+  showAssignModal.value =
+    true
 }
 
-onMounted(() => fetchMeters())
+const handleDelete = (
+  meter: Meter
+) => {
+
+  selectedMeter.value =
+    meter
+
+  showDeleteModal.value =
+    true
+}
+
+onMounted(() => {
+
+  fetchMeters()
+
+  fetchCampuses()
+})
 </script>
 
 <template>
+
   <AppLayout>
 
     <div class="bg-white p-6 rounded-xl shadow">
@@ -158,6 +260,26 @@ onMounted(() => fetchMeters())
 
         </select>
 
+        <select
+          v-if="isSuperAdmin"
+          v-model="campusFilter"
+          class="border border-gray-300 rounded-md px-3 py-2"
+        >
+
+          <option value="">
+            All Campuses
+          </option>
+
+          <option
+            v-for="campus in campuses"
+            :key="campus.id"
+            :value="campus.id"
+          >
+            {{ campus.name }}
+          </option>
+
+        </select>
+
       </div>
 
       <p
@@ -179,6 +301,7 @@ onMounted(() => fetchMeters())
         :meters="filteredMeters"
         @edit="handleEdit"
         @assign="handleAssign"
+        @delete="handleDelete"
       />
 
       <CreateMeterModal
@@ -201,7 +324,15 @@ onMounted(() => fetchMeters())
         @updated="fetchMeters"
       />
 
+      <DeleteMeterModal
+        :show="showDeleteModal"
+        :meter="selectedMeter"
+        @close="showDeleteModal = false"
+        @deleted="fetchMeters"
+      />
+
     </div>
 
   </AppLayout>
+
 </template>

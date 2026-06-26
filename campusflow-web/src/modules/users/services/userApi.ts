@@ -25,3 +25,12 @@ export const updateUserRequest = (
 ) => {
   return api.patch(`/v1/users/${id}`,data)
 }
+
+export const deleteUserRequest = (
+  id: number
+) => {
+
+  return api.delete(
+    `/v1/users/${id}`
+  )
+}

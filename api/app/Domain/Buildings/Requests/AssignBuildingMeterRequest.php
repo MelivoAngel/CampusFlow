@@ -4,7 +4,7 @@ namespace App\Domain\Buildings\Requests;
 
 use Illuminate\Support\Facades\Validator;
 
-class UpdateBuildingRequest
+class AssignBuildingMeterRequest
 {
     public function validate(
         array $data
@@ -16,20 +16,14 @@ class UpdateBuildingRequest
 
             [
 
-                'name' => [
+                'meter_ids' => [
 
-                    'required',
-
-                    'string',
-
-                    'max:255'
+                    'array'
                 ],
 
-                'description' => [
+                'meter_ids.*' => [
 
-                    'nullable',
-
-                    'string'
+                    'exists:meters,id'
                 ]
             ]
 
