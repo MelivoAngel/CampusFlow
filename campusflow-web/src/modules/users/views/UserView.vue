@@ -11,6 +11,7 @@ import AppLayout from '../../../shared/layouts/AppLayout.vue'
 import UserTable from '../components/UserTable.vue'
 import CreateUserModal from '../components/CreateUserModal.vue'
 import EditUserModal from '../components/EditUserModal.vue'
+import DeleteUserModal from '../components/DeleteUserModal.vue'
 
 import { getUsersRequest } from '../services/userApi'
 
@@ -39,6 +40,9 @@ const showCreateModal =
   ref(false)
 
 const showEditModal =
+  ref(false)
+
+const showDeleteModal =
   ref(false)
 
 const selectedUser =
@@ -80,6 +84,10 @@ const availableRoles =
         {
           value: 'field_technician',
           label: 'Field Technician'
+        },
+        {
+          value: 'calendar_admin',
+          label: 'Calendar Admin'
         }
       ]
     }
@@ -96,6 +104,10 @@ const availableRoles =
         {
           value: 'field_technician',
           label: 'Field Technician'
+        },
+        {
+          value: 'calendar_admin',
+          label: 'Calendar Admin'
         }
       ]
     }
@@ -104,6 +116,10 @@ const availableRoles =
       {
         value: 'field_technician',
         label: 'Field Technician'
+      },
+      {
+        value: 'calendar_admin',
+        label: 'Calendar Admin'
       }
     ]
   })
@@ -176,7 +192,8 @@ const filteredUsers =
 const fetchUsers =
   async () => {
 
-    loading.value = true
+    loading.value =
+      true
 
     try {
 
@@ -191,7 +208,8 @@ const fetchUsers =
       console.log(error)
     }
 
-    loading.value = false
+    loading.value =
+      false
   }
 
 const handleEdit =
@@ -201,6 +219,16 @@ const handleEdit =
       user
 
     showEditModal.value =
+      true
+  }
+
+const handleDelete =
+  (user: User) => {
+
+    selectedUser.value =
+      user
+
+    showDeleteModal.value =
       true
   }
 
@@ -321,6 +349,7 @@ onMounted(() => {
         v-else
         :users="filteredUsers"
         @edit="handleEdit"
+        @delete="handleDelete"
       />
 
       <CreateUserModal
@@ -338,6 +367,15 @@ onMounted(() => {
           showEditModal = false
         "
         @updated="fetchUsers"
+      />
+
+      <DeleteUserModal
+        :show="showDeleteModal"
+        :user="selectedUser"
+        @close="
+          showDeleteModal = false
+        "
+        @deleted="fetchUsers"
       />
 
     </div>

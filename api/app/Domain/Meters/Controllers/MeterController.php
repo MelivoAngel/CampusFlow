@@ -209,7 +209,11 @@ class MeterController
 
                 $user->role,
 
-                ['campus_admin','staff']
+                [
+                    'super_admin',
+                    'campus_admin',
+                    'staff'
+                ]
             )
         ) {
             return response()->json([
@@ -289,6 +293,59 @@ class MeterController
             'success' => true,
 
             'message' => 'Meter assigned successfully'
+        ]);
+    }
+
+    public function destroy(
+        Request $request,
+        int $id
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        $meter = Meter::findOrFail(
+            $id
+        );
+
+        if (
+            ! in_array(
+                $user->role,
+                ['super_admin','campus_admin','staff']
+            )
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+
+            ],403);
+        }
+
+        if (
+
+            $user->role !==
+            'super_admin' &&
+
+            $user->campus_id !==
+            $meter->campus_id
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+
+            ],403);
+        }
+
+        $meter->delete();
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' => 'Meter deleted successfully'
         ]);
     }
 }

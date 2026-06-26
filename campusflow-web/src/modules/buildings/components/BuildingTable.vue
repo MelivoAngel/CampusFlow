@@ -8,11 +8,11 @@ import {
 
 import { useAuthStore } from '../../../stores/authStore'
 
-import type { Meter } from '../../../types/meter'
+import type { Building } from '../../../types/building'
 import { adminRoles } from '../../../constants/roles'
 
 defineProps<{
-  meters: Meter[]
+  buildings: Building[]
 }>()
 
 const emit = defineEmits([
@@ -51,30 +51,26 @@ const canEdit = computed(() => {
 
         <tr class="border-b">
 
-          <th class="text-left py-3 font-medium w-56">
+          <th class="text-left py-3 font-medium w-1/4">
             Name
           </th>
 
           <th class="text-center py-3 font-medium w-32">
-            Meter Code
+            Code
           </th>
 
-          <th class="text-center py-3 font-medium">
-            Resource Type
-          </th>
-
-          <th class="text-center py-3 font-medium">
-            Assigned Technician
+          <th class="text-center py-3 font-medium w-40">
+            Assigned Meters
           </th>
 
           <th
             v-if="showCampus"
-            class="text-left py-3 font-medium"
+            class="text-center py-3 font-medium w-40"
           >
             Campus
           </th>
 
-          <th class="text-center py-3 font-medium w-28">
+          <th class="text-center py-3 font-medium w-32">
             Status
           </th>
 
@@ -89,72 +85,41 @@ const canEdit = computed(() => {
       <tbody>
 
         <tr
-          v-for="meter in meters"
-          :key="meter.id"
+          v-for="building in buildings"
+          :key="building.id"
           class="border-b hover:bg-gray-50 transition-colors"
         >
 
           <td
             class="py-4 truncate"
-            :title="meter.name"
+            :title="building.name"
           >
-            {{ meter.name }}
+            {{ building.name }}
           </td>
 
           <td
-            class="py-4 font-mono text-sm text-center"
+            class="py-4 text-center font-mono text-sm"
           >
-            {{ meter.meter_code }}
+            {{ building.code }}
           </td>
 
           <td class="py-4 text-center">
 
             <span
-              v-if="
-                meter.resource_type ===
-                'electricity'
-              "
-              class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700"
+              class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700"
             >
-              Electricity
-            </span>
-
-            <span
-              v-else
-              class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700"
-            >
-              Water
-            </span>
-
-          </td>
-
-          <td class="py-4 text-center">
-
-            <span
-              v-if="meter.assignment?.technician"
-            >
-              {{
-                meter.assignment
-                  .technician
-                  .name
-              }}
-            </span>
-
-            <span
-              v-else
-              class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600"
-            >
-              Unassigned
+              {{ building.meters_count }}
+              meters
             </span>
 
           </td>
 
           <td
             v-if="showCampus"
-            class="py-4"
+            class="py-4 text-center"
           >
             {{
-              meter.campus?.name ||
+              building.campus?.name ||
               '-'
             }}
           </td>
@@ -163,14 +128,14 @@ const canEdit = computed(() => {
 
             <span
               :class="
-                meter.is_active
+                building.meters_count > 0
                   ? 'bg-green-100 text-green-700'
                   : 'bg-red-100 text-red-700'
               "
               class="px-2 py-1 rounded-full text-xs"
             >
               {{
-                meter.is_active
+                building.meters_count > 0
                   ? 'Active'
                   : 'Inactive'
               }}
@@ -189,7 +154,7 @@ const canEdit = computed(() => {
                 @click="
                   emit(
                     'edit',
-                    meter
+                    building
                   )
                 "
                 class="w-9 h-9 flex items-center justify-center rounded-md bg-blue-50 text-blue-600"
@@ -204,12 +169,12 @@ const canEdit = computed(() => {
                 @click="
                   emit(
                     'assign',
-                    meter
+                    building
                   )
                 "
-                class="px-3 py-2 text-sm rounded-md bg-red-50 text-red-600"
+                class="px-3 py-2 text-sm rounded-md bg-amber-50 text-amber-600"
               >
-                Assign Technician
+                Assign Meters
               </button>
 
               <button
@@ -217,7 +182,7 @@ const canEdit = computed(() => {
                 @click="
                   emit(
                     'delete',
-                    meter
+                    building
                   )
                 "
                 class="w-9 h-9 flex items-center justify-center rounded-md bg-red-600 text-white"

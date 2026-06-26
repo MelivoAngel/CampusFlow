@@ -16,12 +16,6 @@ class UpdateBuildingService
             'name' =>
                 $validated['name'],
 
-            'code' =>
-                $validated['code'],
-
-            'type' =>
-                $validated['type'],
-
             'description' =>
                 $validated['description'] ?? null
         ]);

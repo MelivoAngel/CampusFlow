@@ -7,15 +7,14 @@ use App\Domain\Users\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Domain\Meters\Models\Meter;
 
 #[Fillable([
     'campus_id',
     'created_by',
     'name',
     'code',
-    'type',
-    'description',
-    'is_active'
+    'description'
 ])]
 class Building extends Model
 {
@@ -34,5 +33,16 @@ class Building extends Model
             User::class,
             'created_by'
         );
+    }
+
+    public function meters()
+    {
+        return $this->belongsToMany(
+
+            Meter::class,
+
+            'building_meter'
+
+        )->withTimestamps();
     }
 }

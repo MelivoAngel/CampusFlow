@@ -24,32 +24,68 @@ class BuildingService
         return $creator->campus_id;
     }
 
+    public function generateCode(
+        int $campusId
+    ): string
+    {
+        $count =
+            Building::where(
+
+                'campus_id',
+
+                $campusId
+
+            )->count() + 1;
+
+        return
+            'BLD-' .
+            str_pad(
+
+                $count,
+
+                3,
+
+                '0',
+
+                STR_PAD_LEFT
+            );
+    }
+
     public function createBuilding(
         User $creator,
         array $data
     ): Building
     {
-        $campusId = $this->resolveCampusId(
-            $creator,
-            $data['campus_id'] ?? null
-        );
+        $campusId =
+            $this->resolveCampusId(
+
+                $creator,
+
+                $data['campus_id'] ?? null
+            );
+
+        $buildingCode =
+            $this->generateCode(
+                $campusId
+            );
 
         return Building::create([
 
-            'campus_id' => $campusId,
+            'campus_id' =>
+                $campusId,
 
-            'created_by' => $creator->id,
+            'created_by' =>
+                $creator->id,
 
-            'name' => $data['name'],
+            'name' =>
+                $data['name'],
 
-            'code' => $data['code'],
-
-            'type' => $data['type'] ?? null,
+            'code' =>
+                $buildingCode,
 
             'description' =>
-                $data['description'] ?? null,
-
-            'is_active' => false
+                $data['description']
+                ?? null
         ]);
     }
 }

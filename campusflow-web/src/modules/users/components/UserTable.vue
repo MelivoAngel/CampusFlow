@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { PencilSquareIcon } from '@heroicons/vue/24/outline'
+
+import {
+  PencilSquareIcon,
+  TrashIcon
+} from '@heroicons/vue/24/outline'
+
 import { useAuthStore } from '../../../stores/authStore'
 
 import type { User } from '../../../types/user'
@@ -16,7 +21,8 @@ defineProps<{
 
 const emit =
   defineEmits([
-    'edit'
+    'edit',
+    'delete'
   ])
 
 const authStore =
@@ -93,7 +99,7 @@ const canEdit = (
           </th>
 
           <th
-            class="text-center py-3 font-medium w-24"
+            class="text-center py-3 font-medium w-32"
           >
             Actions
           </th>
@@ -157,6 +163,16 @@ const canEdit = (
             </span>
 
             <span
+              v-else-if="
+                user.role ===
+                'calendar_admin'
+              "
+              class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-700"
+            >
+              Calendar Admin
+            </span>
+
+            <span
               v-else
               class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700"
             >
@@ -178,7 +194,7 @@ const canEdit = (
           <td class="py-4">
 
             <div
-              class="flex justify-center"
+              class="flex justify-center gap-3"
             >
 
               <button
@@ -192,6 +208,21 @@ const canEdit = (
                 class="w-9 h-9 flex items-center justify-center rounded-md bg-blue-50 text-blue-600"
               >
                 <PencilSquareIcon
+                  class="w-4 h-4"
+                />
+              </button>
+
+              <button
+                v-if="canEdit(user.role)"
+                @click="
+                  emit(
+                    'delete',
+                    user
+                  )
+                "
+                class="w-9 h-9 flex items-center justify-center rounded-md bg-red-600 text-white"
+              >
+                <TrashIcon
                   class="w-4 h-4"
                 />
               </button>

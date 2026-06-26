@@ -55,7 +55,8 @@ class Meter extends Model
             Building::class,
 
             'building_meter'
-        );
+
+        )->withTimestamps();
     }
 
     public function assignment()
