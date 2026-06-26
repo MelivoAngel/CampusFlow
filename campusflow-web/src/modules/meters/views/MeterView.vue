@@ -18,6 +18,9 @@ const authStore = useAuthStore()
 const meters = ref<Meter[]>([])
 const loading = ref(false)
 
+const search = ref('')
+const filterType = ref('')
+
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
 const showAssignModal = ref(false)
@@ -27,6 +30,42 @@ const selectedMeter = ref<Meter | null>(null)
 const canCreate = computed(() => {
   return adminRoles.includes(
     authStore.user?.role || ''
+  )
+})
+
+const filteredMeters = computed(() => {
+
+  return meters.value.filter(
+    meter => {
+
+      const matchesSearch =
+
+        meter.name
+          .toLowerCase()
+          .includes(
+            search.value
+              .toLowerCase()
+          ) ||
+
+        meter.meter_code
+          .toLowerCase()
+          .includes(
+            search.value
+              .toLowerCase()
+          )
+
+      const matchesType =
+
+        !filterType.value ||
+
+        meter.resource_type ===
+        filterType.value
+
+      return (
+        matchesSearch &&
+        matchesType
+      )
+    }
   )
 })
 
@@ -69,9 +108,18 @@ onMounted(() => fetchMeters())
 
       <div class="flex justify-between mb-6">
 
-        <h1 class="text-2xl font-semibold">
-          Meters
-        </h1>
+        <div>
+
+          <h1 class="text-2xl font-semibold">
+            Meters
+          </h1>
+
+          <p class="text-sm text-gray-500">
+            {{ filteredMeters.length }}
+            registered meters
+          </p>
+
+        </div>
 
         <button
           v-if="canCreate"
@@ -83,6 +131,35 @@ onMounted(() => fetchMeters())
 
       </div>
 
+      <div class="flex gap-3 mb-6">
+
+        <input
+          v-model="search"
+          placeholder="Search meter..."
+          class="border border-gray-300 rounded-md px-3 py-2 flex-1"
+        >
+
+        <select
+          v-model="filterType"
+          class="border border-gray-300 rounded-md px-3 py-2"
+        >
+
+          <option value="">
+            All Types
+          </option>
+
+          <option value="electricity">
+            Electricity
+          </option>
+
+          <option value="water">
+            Water
+          </option>
+
+        </select>
+
+      </div>
+
       <p
         v-if="loading"
         class="text-gray-500"
@@ -91,7 +168,7 @@ onMounted(() => fetchMeters())
       </p>
 
       <p
-        v-else-if="!meters.length"
+        v-else-if="!filteredMeters.length"
         class="text-gray-500"
       >
         No meters found
@@ -99,7 +176,7 @@ onMounted(() => fetchMeters())
 
       <MeterTable
         v-else
-        :meters="meters"
+        :meters="filteredMeters"
         @edit="handleEdit"
         @assign="handleAssign"
       />

@@ -27,12 +27,6 @@ class CreateMeterRequest
                 )
             ],
 
-            'meter_code' => [
-                'required',
-                'string',
-                'max:50'
-            ],
-
             'name' => [
                 'required',
                 'string',
