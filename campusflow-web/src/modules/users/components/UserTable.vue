@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '../../../stores/authStore'
 
 import type { User } from '../../../types/user'
@@ -8,8 +9,6 @@ import {
   campusManageRoles,
   staffManageRoles
 } from '../../../constants/roles'
-
-import { formatLabel } from '../../../utils/formatters'
 
 defineProps<{
   users: User[]
@@ -66,82 +65,147 @@ const canEdit = (
 
 <template>
 
-  <table class="w-full">
+  <div class="overflow-x-auto">
 
-    <thead>
+    <table class="w-full table-fixed">
 
-      <tr class="border-b">
+      <thead>
 
-        <th class="text-left py-3">
-          Name
-        </th>
+        <tr class="border-b">
 
-        <th class="text-left py-3">
-          Email
-        </th>
+          <th class="text-left py-3 font-medium w-48">
+            Name
+          </th>
 
-        <th class="text-left py-3">
-          Role
-        </th>
+          <th class="text-left py-3 font-medium w-64">
+            Email
+          </th>
 
-        <th
-          v-if="showCampus"
-          class="text-left py-3"
-        >
-          Campus
-        </th>
+          <th class="text-center py-3 font-medium">
+            Role
+          </th>
 
-        <th class="text-left py-3">
-          Actions
-        </th>
-
-      </tr>
-
-    </thead>
-
-    <tbody>
-
-      <tr
-        v-for="user in users"
-        :key="user.id"
-        class="border-b"
-      >
-
-        <td class="py-4">
-          {{ user.name }}
-        </td>
-
-        <td class="py-4">
-          {{ user.email }}
-        </td>
-
-        <td class="py-4">
-          {{ formatLabel(user.role) }}
-        </td>
-
-        <td
-          v-if="showCampus"
-          class="py-4"
-        >
-          {{ user.campus?.name || '-' }}
-        </td>
-
-        <td class="py-4">
-
-          <button
-            v-if="canEdit(user.role)"
-            @click="emit('edit',user)"
-            class="text-blue-600"
+          <th
+            v-if="showCampus"
+            class="text-left py-3 font-medium"
           >
-            Edit
-          </button>
+            Campus
+          </th>
 
-        </td>
+          <th
+            class="text-center py-3 font-medium w-24"
+          >
+            Actions
+          </th>
 
-      </tr>
+        </tr>
 
-    </tbody>
+      </thead>
 
-  </table>
+      <tbody>
+
+        <tr
+          v-for="user in users"
+          :key="user.id"
+          class="border-b hover:bg-gray-50 transition-colors"
+        >
+
+          <td
+            class="py-4 truncate"
+            :title="user.name"
+          >
+            {{ user.name }}
+          </td>
+
+          <td
+            class="py-4 truncate"
+            :title="user.email"
+          >
+            {{ user.email }}
+          </td>
+
+          <td class="py-4 text-center">
+
+            <span
+              v-if="
+                user.role ===
+                'super_admin'
+              "
+              class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700"
+            >
+              Super Admin
+            </span>
+
+            <span
+              v-else-if="
+                user.role ===
+                'campus_admin'
+              "
+              class="px-2 py-1 text-xs rounded-full bg-emerald-100 text-emerald-700"
+            >
+              Campus Admin
+            </span>
+
+            <span
+              v-else-if="
+                user.role ===
+                'staff'
+              "
+              class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700"
+            >
+              Staff
+            </span>
+
+            <span
+              v-else
+              class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700"
+            >
+              Field Technician
+            </span>
+
+          </td>
+
+          <td
+            v-if="showCampus"
+            class="py-4"
+          >
+            {{
+              user.campus?.name ||
+              '-'
+            }}
+          </td>
+
+          <td class="py-4">
+
+            <div
+              class="flex justify-center"
+            >
+
+              <button
+                v-if="canEdit(user.role)"
+                @click="
+                  emit(
+                    'edit',
+                    user
+                  )
+                "
+                class="w-9 h-9 flex items-center justify-center rounded-md bg-blue-50 text-blue-600"
+              >
+                <PencilSquareIcon
+                  class="w-4 h-4"
+                />
+              </button>
+
+            </div>
+
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
 
 </template>

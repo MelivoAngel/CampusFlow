@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { ref,onMounted,computed } from 'vue'
+import {
+  ref,
+  onMounted,
+  computed
+} from 'vue'
+
 import { useAuthStore } from '../../../stores/authStore'
 
 import AppLayout from '../../../shared/layouts/AppLayout.vue'
@@ -21,6 +26,15 @@ const users =
 const loading =
   ref(false)
 
+const search =
+  ref('')
+
+const roleFilter =
+  ref('')
+
+const campusFilter =
+  ref('')
+
 const showCreateModal =
   ref(false)
 
@@ -30,39 +44,165 @@ const showEditModal =
 const selectedUser =
   ref<User | null>(null)
 
-const canCreate = computed(() => {
-  return adminRoles.includes(
-    authStore.user?.role || ''
-  )
-})
+const isSuperAdmin =
+  computed(() => {
 
-const fetchUsers = async () => {
-  loading.value = true
+    return (
+      authStore.user?.role ===
+      'super_admin'
+    )
+  })
 
-  try {
-    const response =
-      await getUsersRequest()
+const canCreate =
+  computed(() => {
 
-    users.value =
-      response.data.data
+    return adminRoles.includes(
+      authStore.user?.role || ''
+    )
+  })
+
+const availableRoles =
+  computed(() => {
+
+    if (
+      authStore.user?.role ===
+      'super_admin'
+    ) {
+      return [
+        {
+          value: 'campus_admin',
+          label: 'Campus Admin'
+        },
+        {
+          value: 'staff',
+          label: 'Staff'
+        },
+        {
+          value: 'field_technician',
+          label: 'Field Technician'
+        }
+      ]
+    }
+
+    if (
+      authStore.user?.role ===
+      'campus_admin'
+    ) {
+      return [
+        {
+          value: 'staff',
+          label: 'Staff'
+        },
+        {
+          value: 'field_technician',
+          label: 'Field Technician'
+        }
+      ]
+    }
+
+    return [
+      {
+        value: 'field_technician',
+        label: 'Field Technician'
+      }
+    ]
+  })
+
+const campuses =
+  computed(() => {
+
+    const uniqueCampuses =
+      users.value
+        .map(
+          user => user.campus?.name
+        )
+        .filter(Boolean)
+
+    return [
+      ...new Set(
+        uniqueCampuses
+      )
+    ]
+  })
+
+const filteredUsers =
+  computed(() => {
+
+    return users.value.filter(
+      user => {
+
+        const matchesSearch =
+
+          user.name
+            .toLowerCase()
+            .includes(
+              search.value
+                .toLowerCase()
+            ) ||
+
+          user.email
+            .toLowerCase()
+            .includes(
+              search.value
+                .toLowerCase()
+            )
+
+        const matchesRole =
+
+          !roleFilter.value ||
+
+          user.role ===
+          roleFilter.value
+
+        const matchesCampus =
+
+          !campusFilter.value ||
+
+          user.campus?.name ===
+          campusFilter.value
+
+        return (
+
+          matchesSearch &&
+
+          matchesRole &&
+
+          matchesCampus
+        )
+      }
+    )
+  })
+
+const fetchUsers =
+  async () => {
+
+    loading.value = true
+
+    try {
+
+      const response =
+        await getUsersRequest()
+
+      users.value =
+        response.data.data
+    }
+
+    catch (error) {
+      console.log(error)
+    }
+
+    loading.value = false
   }
 
-  catch (error) {
-    console.log(error)
+const handleEdit =
+  (user: User) => {
+
+    selectedUser.value =
+      user
+
+    showEditModal.value =
+      true
   }
-
-  loading.value = false
-}
-
-const handleEdit = (
-  user: User
-) => {
-  selectedUser.value =
-    user
-
-  showEditModal.value =
-    true
-}
 
 onMounted(() => {
   fetchUsers()
@@ -70,23 +210,94 @@ onMounted(() => {
 </script>
 
 <template>
+
   <AppLayout>
 
-    <div class="bg-white p-6 rounded-xl shadow">
+    <div
+      class="bg-white p-6 rounded-xl shadow"
+    >
 
-      <div class="flex justify-between mb-6">
+      <div
+        class="flex justify-between mb-6"
+      >
 
-        <h1 class="text-2xl font-semibold">
-          Users
-        </h1>
+        <div>
+
+          <h1
+            class="text-2xl font-semibold"
+          >
+            Users
+          </h1>
+
+          <p
+            class="text-sm text-gray-500"
+          >
+            {{ filteredUsers.length }}
+            registered users
+          </p>
+
+        </div>
 
         <button
           v-if="canCreate"
-          @click="showCreateModal = true"
+          @click="
+            showCreateModal = true
+          "
           class="bg-emerald-700 text-white px-4 py-2 rounded-md"
         >
           Add User
         </button>
+
+      </div>
+
+      <div
+        class="flex gap-3 mb-6"
+      >
+
+        <input
+          v-model="search"
+          placeholder="Search user..."
+          class="border border-gray-300 rounded-md px-3 py-2 flex-1"
+        >
+
+        <select
+          v-if="isSuperAdmin"
+          v-model="campusFilter"
+          class="border border-gray-300 rounded-md px-3 py-2"
+        >
+
+          <option value="">
+            All Campuses
+          </option>
+
+          <option
+            v-for="campus in campuses"
+            :key="campus"
+            :value="campus"
+          >
+            {{ campus }}
+          </option>
+
+        </select>
+
+        <select
+          v-model="roleFilter"
+          class="border border-gray-300 rounded-md px-3 py-2"
+        >
+
+          <option value="">
+            All Roles
+          </option>
+
+          <option
+            v-for="role in availableRoles"
+            :key="role.value"
+            :value="role.value"
+          >
+            {{ role.label }}
+          </option>
+
+        </select>
 
       </div>
 
@@ -98,7 +309,9 @@ onMounted(() => {
       </p>
 
       <p
-        v-else-if="!users.length"
+        v-else-if="
+          !filteredUsers.length
+        "
         class="text-gray-500"
       >
         No users found
@@ -106,24 +319,29 @@ onMounted(() => {
 
       <UserTable
         v-else
-        :users="users"
+        :users="filteredUsers"
         @edit="handleEdit"
       />
 
       <CreateUserModal
         :show="showCreateModal"
-        @close="showCreateModal = false"
+        @close="
+          showCreateModal = false
+        "
         @created="fetchUsers"
       />
 
       <EditUserModal
         :show="showEditModal"
         :user="selectedUser"
-        @close="showEditModal = false"
+        @close="
+          showEditModal = false
+        "
         @updated="fetchUsers"
       />
 
     </div>
 
   </AppLayout>
+
 </template>
