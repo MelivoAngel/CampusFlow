@@ -468,4 +468,58 @@ class MeterReadingController
             'data' => $reading
         ]);
     }
+
+    public function myPendingReadings(
+        Request $request
+    ): JsonResponse
+    {
+        $user = $request->user();
+
+        if (
+            $user->role !==
+            'field_technician'
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' => 'Access denied'
+            ],403);
+        }
+
+        $readings = MeterReading::with([
+
+            'meter:id,name,resource_type'
+
+        ])->where(
+
+            'technician_id',
+            $user->id
+
+        )->where(
+
+            'is_approved',
+            false
+
+        )->select([
+
+            'id',
+
+            'meter_id',
+
+            'current_reading',
+
+            'recorded_date',
+
+            'is_approved'
+
+        ])->latest()->get();
+
+        return response()->json([
+
+            'success' => true,
+
+            'data' => $readings
+        ]);
+    }
 }

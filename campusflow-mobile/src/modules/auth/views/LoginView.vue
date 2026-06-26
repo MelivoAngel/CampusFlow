@@ -28,17 +28,9 @@ const loading =
   ref(false)
 
 const handleLogin = async () => {
-  loading.value = true
 
-  console.log(
-    'email:',
-    email.value
-  )
-
-  console.log(
-    'password:',
-    password.value
-  )
+  loading.value =
+    true
 
   try {
     const response =
@@ -56,7 +48,9 @@ const handleLogin = async () => {
       user.role !==
       'field_technician'
     ) {
-      loading.value = false
+      loading.value =
+        false
+
       return
     }
 
@@ -65,26 +59,30 @@ const handleLogin = async () => {
       response.data.data.token,
 
       user
-    )
+    );
 
-    router.push('/meters')
+    (
+      document.activeElement as HTMLElement
+    )?.blur()
+
+    router.push(
+
+      '/dashboard'
+    )
   }
 
-  catch (error: any) {
-
-    console.log(
-      error.response?.data
-    )
-
+  catch (error) {
     console.log(error)
   }
 
-  loading.value = false
+  loading.value =
+    false
 }
 
 const handleEmail = (
   event: any
 ) => {
+
   email.value =
     event.detail.value
 }
@@ -92,6 +90,7 @@ const handleEmail = (
 const handlePassword = (
   event: any
 ) => {
+
   password.value =
     event.detail.value
 }
@@ -106,7 +105,9 @@ const handlePassword = (
       <div class="login-container">
 
         <h2>
+
           CampusFLOW
+
         </h2>
 
         <ion-input
@@ -124,7 +125,9 @@ const handlePassword = (
           expand="block"
           @click="handleLogin"
         >
+
           {{ loading ? 'Loading...' : 'Login' }}
+
         </ion-button>
 
       </div>
