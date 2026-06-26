@@ -8,5 +8,4 @@ enum MeterResourceType: string
 
     case ELECTRICITY = 'electricity';
 
-    case SOLAR = 'solar';
 }

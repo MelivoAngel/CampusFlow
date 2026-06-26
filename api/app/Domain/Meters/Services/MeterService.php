@@ -8,6 +8,10 @@ use App\Domain\Users\Models\User;
 
 class MeterService
 {
+    public function __construct(
+        private MeterCodeService $meterCodeService
+    ) {}
+
     public function resolveCampusId(
         User $creator,
         ?int $requestedCampusId
@@ -32,9 +36,23 @@ class MeterService
         return Meter::where(
             'campus_id',
             $campusId
-        )->where(
+        )
+        ->where(
             'meter_code',
             $meterCode
-        )->exists();
+        )
+        ->exists();
+    }
+
+    public function create(array $data)
+    {
+        $data['meter_code'] =
+            $this->meterCodeService
+                ->generate(
+                    $data['campus_id'],
+                    $data['resource_type']
+                );
+
+        return Meter::create($data);
     }
 }

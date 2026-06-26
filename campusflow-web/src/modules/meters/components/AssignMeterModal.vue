@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref,onMounted,watch } from 'vue'
+import { UserPlusIcon } from '@heroicons/vue/24/outline'
 
 import {
   getUsersRequest
@@ -86,7 +87,7 @@ const handleAssign = async () => {
 watch(() => props.show,() => {
 
   technicianId.value =
-    props.meter?.assignment?.technician.id ||
+    props.meter?.assignment?.technician?.id ||
     null
 })
 
@@ -102,45 +103,100 @@ onMounted(() => {
     class="fixed inset-0 bg-black/40 flex items-center justify-center"
   >
 
-    <div class="bg-white p-6 rounded-xl w-96">
+    <div class="bg-white p-6 rounded-2xl w-[430px] shadow-xl">
 
-      <h2 class="text-lg font-semibold mb-4">
-        Assign Technician
-      </h2>
+      <div class="flex items-center gap-3 mb-5">
 
-      <select
-        v-model="technicianId"
-        class="w-full border rounded-md p-2 mb-4"
+        <div
+          class="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center"
+        >
+          <UserPlusIcon
+            class="w-5 h-5 text-red-600"
+          />
+        </div>
+
+        <div>
+
+          <h2 class="text-lg font-semibold">
+            Assign Technician
+          </h2>
+
+          <p class="text-sm text-gray-500">
+            Assign a technician to this meter
+          </p>
+
+        </div>
+
+      </div>
+
+      <div
+        v-if="meter"
+        class="mb-5 p-3 rounded-lg bg-gray-50 border"
       >
 
-        <option :value="null">
-          Select Technician
-        </option>
+        <p class="text-xs text-gray-500 mb-1">
+          Selected Meter
+        </p>
 
-        <option
-          v-for="technician in technicians"
-          :key="technician.id"
-          :value="technician.id"
+        <p class="font-medium">
+          {{ meter.name }}
+        </p>
+
+        <p class="text-sm text-gray-500 font-mono">
+          {{ meter.meter_code }}
+        </p>
+
+      </div>
+
+      <div class="mb-6">
+
+        <label
+          class="block text-sm font-medium mb-2"
         >
-          {{ technician.name }}
-        </option>
+          Technician
+        </label>
 
-      </select>
+        <select
+          v-model="technicianId"
+          class="w-full border border-gray-300 rounded-lg px-3 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+        >
 
-      <div class="flex justify-end gap-3">
+          <option :value="null">
+            Select Technician
+          </option>
+
+          <option
+            v-for="technician in technicians"
+            :key="technician.id"
+            :value="technician.id"
+          >
+            {{ technician.name }}
+          </option>
+
+        </select>
+
+      </div>
+
+      <div
+        class="flex justify-end gap-3 pt-2 border-t"
+      >
 
         <button
           @click="emit('close')"
-          class="text-gray-600"
+          class="px-4 py-2 text-gray-600 hover:text-black"
         >
           Cancel
         </button>
 
         <button
           @click="handleAssign"
-          class="bg-emerald-700 text-white px-4 py-2 rounded-md"
+          class="bg-red-600 text-white px-5 py-2 rounded-lg"
         >
-          {{ loading ? 'Assigning...' : 'Assign' }}
+          {{
+            loading
+              ? 'Assigning...'
+              : 'Assign'
+          }}
         </button>
 
       </div>
