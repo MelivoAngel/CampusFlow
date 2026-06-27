@@ -9,6 +9,7 @@ use App\Domain\Campuses\Controllers\CampusController;
 use App\Domain\Schedules\Controllers\ScheduleController;
 use App\Domain\Facilities\Controllers\FacilityController;
 use App\Domain\Schedules\Controllers\CalendarDashboardController;
+use App\Domain\Dashboard\Controllers\DashboardController;
 
 
 Route::prefix('v1')->group(function () {
@@ -60,4 +61,5 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->patch('/facilities/{id}',[FacilityController::class, 'update']);
     Route::middleware(['auth:sanctum'])->delete('/facilities/{id}',[FacilityController::class,'destroy']);
     Route::middleware(['auth:sanctum'])->get('/calendar-dashboard',[CalendarDashboardController::class, 'index']);
+    Route::middleware(['auth:sanctum'])->get('/admin-dashboard',[DashboardController::class, 'admin']);
 });
