@@ -11,6 +11,9 @@ use App\Domain\Schedules\Services\ScheduleService;
 use App\Domain\Schedules\Services\UpdateScheduleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Domain\Schedules\Services\CancelScheduleService;
+use App\Domain\Schedules\Requests\RescheduleScheduleRequest;
+use App\Domain\Schedules\Services\RescheduleScheduleService;
 
 class ScheduleController
 {
@@ -199,6 +202,156 @@ class ScheduleController
                 'Schedule updated successfully',
 
             'data' => $updated
+        ]);
+    }
+
+    public function reschedule(
+        Request $request,
+        int $id,
+        RescheduleScheduleRequest $validator,
+        RescheduleScheduleService $service
+    ): JsonResponse
+    {
+        $user =
+            $request->user();
+
+        $schedule =
+            Schedule::find(
+                $id
+            );
+
+        if (! $schedule) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Schedule not found'
+
+            ],404);
+        }
+
+        if (
+
+            $user->role !==
+            'super_admin' &&
+
+            $user->campus_id !==
+            $schedule->campus_id
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Access denied'
+
+            ],403);
+        }
+
+        $validated =
+            $validator->validate(
+
+                $request->all()
+            );
+
+        $updated =
+            $service->reschedule(
+
+                $schedule,
+
+                $validated
+            );
+
+        if (! $updated) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Facility already reserved during that time'
+
+            ],422);
+        }
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' =>
+                'Schedule rescheduled successfully',
+
+            'data' => $updated
+        ]);
+    }
+
+    public function cancel(
+        Request $request,
+        int $id,
+        CancelScheduleService $service
+    ): JsonResponse
+    {
+        $user =
+            $request->user();
+
+        $schedule =
+            Schedule::find(
+                $id
+            );
+
+        if (! $schedule) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Schedule not found'
+
+            ],404);
+        }
+
+        if (
+
+            $user->role !==
+            'super_admin' &&
+
+            $user->campus_id !==
+            $schedule->campus_id
+        ) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Access denied'
+
+            ],403);
+        }
+
+        $cancelled =
+            $service->cancel(
+                $schedule
+            );
+
+        if (! $cancelled) {
+            return response()->json([
+
+                'success' => false,
+
+                'message' =>
+                    'Schedule can no longer be cancelled'
+
+            ],422);
+        }
+
+        return response()->json([
+
+            'success' => true,
+
+            'message' =>
+                'Schedule cancelled successfully',
+
+            'data' => $cancelled
         ]);
     }
 

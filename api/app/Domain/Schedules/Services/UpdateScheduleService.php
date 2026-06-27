@@ -35,28 +35,23 @@ class UpdateScheduleService
             $query
         ) use ($data) {
 
-            $query->whereBetween(
+            $query->where(
 
                 'start_time',
 
-                [
+                '<',
 
-                    $data['start_time'],
+                $data['end_time']
 
-                    $data['end_time']
-                ]
-
-            )->orWhereBetween(
+            )->where(
 
                 'end_time',
 
-                [
+                '>',
 
-                    $data['start_time'],
-
-                    $data['end_time']
-                ]
+                $data['start_time']
             );
+
         })->exists();
 
         if (

@@ -27,7 +27,9 @@ use Illuminate\Database\Eloquent\Model;
 
     'end_time',
 
-    'description'
+    'description',
+
+    'status'
 ])]
 class Schedule extends Model
 {

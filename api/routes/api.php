@@ -8,6 +8,7 @@ use App\Domain\Meters\Controllers\MeterAnomalyController;
 use App\Domain\Campuses\Controllers\CampusController;
 use App\Domain\Schedules\Controllers\ScheduleController;
 use App\Domain\Facilities\Controllers\FacilityController;
+use App\Domain\Schedules\Controllers\CalendarDashboardController;
 
 
 Route::prefix('v1')->group(function () {
@@ -51,9 +52,12 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum'])->get('/schedules',[ScheduleController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/schedules',[ScheduleController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/schedules/{id}',[ScheduleController::class, 'update']);
+    Route::middleware(['auth:sanctum'])->patch('/schedules/{id}/reschedule',[ScheduleController::class,'reschedule']);
+    Route::middleware(['auth:sanctum'])->patch('/schedules/{id}/cancel',[ScheduleController::class,'cancel']);
     Route::middleware(['auth:sanctum'])->delete('/schedules/{id}',[ScheduleController::class,'destroy']);
     Route::middleware(['auth:sanctum'])->get('/facilities',[FacilityController::class, 'index']);
     Route::middleware(['auth:sanctum'])->post('/facilities',[FacilityController::class, 'store']);
     Route::middleware(['auth:sanctum'])->patch('/facilities/{id}',[FacilityController::class, 'update']);
     Route::middleware(['auth:sanctum'])->delete('/facilities/{id}',[FacilityController::class,'destroy']);
+    Route::middleware(['auth:sanctum'])->get('/calendar-dashboard',[CalendarDashboardController::class, 'index']);
 });
