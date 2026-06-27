@@ -59,7 +59,9 @@ export const menu = {
 
       items: [
 
-        { name: 'Events', path: '/events' }
+        { name: 'Facilities', path: '/facilities' },
+
+        { name: 'Reservations', path: '/schedules' }
       ]
     }
   ],
@@ -75,7 +77,9 @@ export const menu = {
 
       items: [
 
-        { name: 'Events', path: '/events' }
+        { name: 'Facilities', path: '/facilities' },
+
+        { name: 'Reservations', path: '/schedules' }
       ]
     }
   ],
@@ -99,13 +103,13 @@ export const menu = {
     },
 
     {
-      section: 'Calendar',
+      section: 'Calendar Management',
 
       items: [
 
-        { name: 'Events', path: '/events' },
+        { name: 'Facilities', path: '/facilities' },
 
-        { name: 'Calendar', path: '/calendar' }
+        { name: 'Reservations', path: '/schedules' }
       ]
     }
   ]

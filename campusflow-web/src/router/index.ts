@@ -9,6 +9,8 @@ import MeterView from '../modules/meters/views/MeterView.vue'
 import BuildingView from '../modules/buildings/views/BuildingView.vue'
 import ApprovalView from '../modules/approvals/views/ApprovalView.vue'
 import AnomalyView from '../modules/anomalies/views/AnomalyView.vue'
+import FacilityView from '../modules/facilities/views/FacilityView.vue'
+import ScheduleView from '../modules/schedules/views/ScheduleView.vue'
 
 const routes = [
 
@@ -100,6 +102,27 @@ const routes = [
   },
 
   {
+    path: '/facilities',
+
+    name: 'facilities',
+
+    component: FacilityView,
+
+    meta: {
+      requiresAuth: true,
+
+      roles: [
+
+        'super_admin',
+
+        'campus_admin',
+
+        'calendar_admin'
+      ]
+    }
+  },
+
+  {
     path: '/approvals',
 
     name: 'approvals',
@@ -133,6 +156,27 @@ const routes = [
         'campus_admin',
 
         'staff'
+      ]
+    }
+  },
+
+  {
+    path: '/schedules',
+
+    name: 'schedules',
+
+    component: ScheduleView,
+
+    meta: {
+      requiresAuth: true,
+
+      roles: [
+
+        'super_admin',
+
+        'campus_admin',
+
+        'calendar_admin'
       ]
     }
   }
