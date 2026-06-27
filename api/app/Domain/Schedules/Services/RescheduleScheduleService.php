@@ -2,41 +2,25 @@
 
 namespace App\Domain\Schedules\Services;
 
-use App\Domain\Schedules\Enums\SchedulePermission;
 use App\Domain\Schedules\Models\Schedule;
-use App\Domain\Users\Models\User;
+use App\Domain\Schedules\Enums\ScheduleStatus;
 
-class ScheduleService
+class RescheduleScheduleService
 {
-    public function resolveCampusId(
-        User $creator,
-        ?int $requestedCampusId
-    ): ?int
-    {
-        if (
-            SchedulePermission::requiresManualCampus(
-                $creator->role
-            )
-        ) {
-            return $requestedCampusId;
-        }
-
-        return $creator->campus_id;
-    }
-
-    public function create(
-        User $creator,
+    public function reschedule(
+        Schedule $schedule,
         array $data
     ): ?Schedule
     {
-        $campusId = $this->resolveCampusId(
-
-            $creator,
-
-            $data['campus_id'] ?? null
-        );
-
         $overlap = Schedule::where(
+
+            'id',
+
+            '!=',
+
+            $schedule->id
+
+        )->where(
 
             'facility_id',
 
@@ -77,20 +61,10 @@ class ScheduleService
             return null;
         }
 
-        return Schedule::create([
-
-            'campus_id' => $campusId,
-
-            'created_by' => $creator->id,
+        $schedule->update([
 
             'facility_id' =>
                 $data['facility_id'],
-
-            'organization' =>
-                $data['organization'],
-
-            'event_name' =>
-                $data['event_name'],
 
             'event_date' =>
                 $data['event_date'],
@@ -101,8 +75,10 @@ class ScheduleService
             'end_time' =>
                 $data['end_time'],
 
-            'description' =>
-                $data['description'] ?? null
+            'status' =>
+                ScheduleStatus::RESCHEDULED->value
         ]);
+
+        return $schedule;
     }
 }
