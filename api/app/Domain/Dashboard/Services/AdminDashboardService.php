@@ -4,37 +4,148 @@ namespace App\Domain\Dashboard\Services;
 
 use Carbon\Carbon;
 use App\Domain\Users\Models\User;
-use App\Domain\Meters\Models\Meter;
 use App\Domain\Meters\Models\MeterReading;
 use App\Domain\Meters\Models\MeterAnomaly;
-use App\Domain\Campuses\Models\Campus;
-use App\Domain\Buildings\Models\Building;
+use App\Domain\Schedules\Models\Schedule;
 
 class AdminDashboardService
 {
-    public function get(): array
+    public function get(
+        User $user
+    ): array
     {
+        $readingsQuery =
+            MeterReading::query();
+
+        $anomalyQuery =
+            MeterAnomaly::query();
+
+        $scheduleQuery =
+            Schedule::query();
+
+        if (
+
+            $user->role !==
+            'super_admin'
+        ) {
+
+            $readingsQuery->whereHas(
+
+                'meter',
+
+                fn ($query) =>
+
+                $query->where(
+
+                    'campus_id',
+
+                    $user->campus_id
+                )
+            );
+
+            $anomalyQuery->whereHas(
+
+                'meter',
+
+                fn ($query) =>
+
+                $query->where(
+
+                    'campus_id',
+
+                    $user->campus_id
+                )
+            );
+
+            $scheduleQuery->where(
+
+                'campus_id',
+
+                $user->campus_id
+            );
+        }
+
+        $waterConsumption =
+
+            (clone $readingsQuery)
+
+            ->whereMonth(
+
+                'recorded_date',
+
+                Carbon::now()->month
+
+            )
+
+            ->whereHas(
+
+                'meter',
+
+                fn ($query) =>
+
+                $query->where(
+
+                    'resource_type',
+
+                    'water'
+                )
+            )
+
+            ->sum(
+
+                'consumption'
+            );
+
+        $electricityConsumption =
+
+            (clone $readingsQuery)
+
+            ->whereMonth(
+
+                'recorded_date',
+
+                Carbon::now()->month
+
+            )
+
+            ->whereHas(
+
+                'meter',
+
+                fn ($query) =>
+
+                $query->where(
+
+                    'resource_type',
+
+                    'electricity'
+                )
+            )
+
+            ->sum(
+
+                'consumption'
+            );
+
         return [
 
-            'total_campuses' =>
+            'monthly_water_consumption' =>
 
-                Campus::count(),
+                $waterConsumption,
 
-            'total_buildings' =>
+            'monthly_electricity_consumption' =>
 
-                Building::count(),
+                $electricityConsumption,
 
-            'total_meters' =>
+            'monthly_waste' =>
 
-                Meter::count(),
-
-            'total_users' =>
-
-                User::count(),
+                null,
 
             'readings_today' =>
 
-                MeterReading::whereDate(
+                (clone $readingsQuery)
+
+                ->whereDate(
 
                     'recorded_date',
 
@@ -44,7 +155,9 @@ class AdminDashboardService
 
             'pending_readings' =>
 
-                MeterReading::where(
+                (clone $readingsQuery)
+
+                ->where(
 
                     'is_approved',
 
@@ -54,7 +167,9 @@ class AdminDashboardService
 
             'approved_readings' =>
 
-                MeterReading::where(
+                (clone $readingsQuery)
+
+                ->where(
 
                     'is_approved',
 
@@ -62,9 +177,11 @@ class AdminDashboardService
 
                 )->count(),
 
-            'detected_anomalies' =>
+            'active_anomalies' =>
 
-                MeterAnomaly::where(
+                (clone $anomalyQuery)
+
+                ->where(
 
                     'is_resolved',
 
@@ -72,13 +189,41 @@ class AdminDashboardService
 
                 )->count(),
 
+            'events_today' =>
+
+                (clone $scheduleQuery)
+
+                ->whereDate(
+
+                    'event_date',
+
+                    Carbon::today()
+
+                )->count(),
+
+            'upcoming_events' =>
+
+                (clone $scheduleQuery)
+
+                ->where(
+
+                    'status',
+
+                    'upcoming'
+
+                )->count(),
+
             'recent_anomalies' =>
 
-                MeterAnomaly::with([
+                (clone $anomalyQuery)
+
+                ->with([
 
                     'meter:id,name,meter_code'
 
-                ])->where(
+                ])
+
+                ->where(
 
                     'is_resolved',
 
@@ -92,13 +237,17 @@ class AdminDashboardService
 
             'pending_approvals' =>
 
-                MeterReading::with([
+                (clone $readingsQuery)
+
+                ->with([
 
                     'technician:id,name',
 
                     'meter:id,name,meter_code'
 
-                ])->where(
+                ])
+
+                ->where(
 
                     'is_approved',
 
